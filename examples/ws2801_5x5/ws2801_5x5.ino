@@ -17,6 +17,8 @@
   I make no claim to it, and no claim that it's suitable for your or any other purposes.
   It does seem to make the lights blink nicely though.  If you need a formal license, use BSD or contact me 
   and I'll probably release it under whatever nonexclusive license you need.  
+  
+  
 */
 /*****************************************************************************
 Example sketch for driving Adafruit WS2801 pixels!
@@ -90,16 +92,8 @@ void setup() {
 
 
 void loop() {
-  fade(red,orange,100,100);
-  fade(orange,yellow,100,100);
-  fade(yellow,green,100,100);
-  fade(green,blue,100,100);
-  fade(blue,indigo,100,100);
-  fade(indigo,violet,100,100);
-  fade(violet,red,100,100);
-  
-  spinner(red,blue,150,30);
-  bang(black, red, 250, false, 1000);  
+  spinner(red,blue,150,30,true);
+  spinner(red,blue,150,30,false);  
   smiley(black, yellow, 250, false, 1000);  
   fireRand(100);
   waterRand(100);
@@ -108,7 +102,19 @@ void loop() {
   fireRand(10);
   waterRand(10);  
   primaryBars();
-  flashlight(5000);  
+  
+  flashlight(5000);    
+  
+  fade(red,orange,100,100);
+  fade(orange,yellow,100,100);
+  fade(yellow,green,100,100);
+  fade(green,blue,100,100);
+  fade(blue,indigo,100,100);
+  fade(indigo,violet,100,100);
+  fade(violet,red,100,100);
+ 
+  bang(black, red, 250, false, 1000);  
+  smiley(black, yellow, 250, false, 1000);  
   colorWipe(Color(255, 0, 0), 50);
   colorWipe(Color(0, 255, 0), 50);
   colorWipe(Color(0, 0, 255), 50);  
@@ -126,7 +132,6 @@ void loop() {
   spiral(blue ,orangered, 50, false, 0);    
   spiral(blue ,orangered, 50, true, 0);    
   ants(Color(0,255,0),Color(0,0,0),500);  
-  clock(10, Color(0,0,255), Color(0,255,0), 50);
   allBlink(10, Color(255,0,0), Color(0,0,0), 500);
   randommy();
   ants(Color(0,0,255),Color(255,0,0),500);
@@ -288,7 +293,7 @@ void spiral(uint32_t bc, uint32_t fc, uint8_t wait, boolean reverse, int enddela
   colorByNumber(pixels, pixelCount, bc, fc, wait, reverse, enddelay);
 }
 
-//BE - Either bullseye, or bullshit, whichever your preference.  Bulls is intentionally truncated.
+//BE - Bulls is intentionally truncated from one of two possible names.
 void bulls(uint32_t c1, uint32_t c2, uint32_t c3, uint8_t wait, int loops)
 {
   ringSet(Color(0,0,0));
@@ -326,49 +331,29 @@ void bulls(uint32_t c1, uint32_t c2, uint32_t c3, uint8_t wait, int loops)
 }
 
 //BE - should have called this propellor, I think.  It spins a line.
-void spinner(uint32_t bgc, uint32_t fgc, uint8_t wait, int loops)
+void spinner(uint32_t bgc, uint32_t fgc, uint8_t wait, int loops, boolean reversed)
 {
   ringSet(bgc);
-  int frame1[] = {0,8,12,16,24};
-  int frame2[] = {10,11,12,13,14};
-  int frame3[] = {20,18,12,6,4};
-  int frame4[] = {22,17,12,7,2};
-
+  int frames[4][5] = {{22,17,12,7,2},{20,18,12,6,4},{10,11,12,13,14},{0,8,12,16,24}};
+  
   for(int i=0;i<loops+1;i++)
   {
-    setPixelGroup(frame1, 5, fgc);
-    delay(wait);
-    ringSet(bgc);    
-    setPixelGroup(frame2, 5, fgc);
-    delay(wait);  
-    ringSet(bgc);
-    setPixelGroup(frame3, 5, fgc);
-    delay(wait); 
-    ringSet(bgc);    
-    setPixelGroup(frame4, 5, fgc);
-    delay(wait); 
-    ringSet(bgc);    
-  }
-}
-
-
-
-
-//BE - todo - send segments around the ring.  I've always hated this pattern.  
-//Nevermind.  You do it if you want it.
-void clock(uint8_t loops, uint32_t c, uint32_t c2, uint8_t wait ){
-  int i,j;
-  //segment initial is 0 to (numPixels/2), with wrap at numPixels.
-  int bottom,top;
-  bottom = 0;  
-  top = strip.numPixels()/2;  
-
-  for(j=0;j<loops;j++)
-  {
-    for(i=0;i<strip.numPixels();i++)
+    if(reversed)
     {
-  
-    }  
+      for(int j=3;j>-1;j--)
+      {    
+        setPixelGroup(frames[j], 5, fgc);
+        delay(wait);
+        ringSet(bgc);    
+      }
+    }else{
+      for(int j=0;j<4;j++)
+      {
+        setPixelGroup(frames[j], 5, fgc);
+        delay(wait);
+        ringSet(bgc);    
+      }
+    }
   }
 }
 
@@ -474,6 +459,19 @@ void ringSet(uint32_t c) {
       strip.setPixelColor(i, c);
   }
   strip.show();  
+}
+
+void paletteRand(uint32_t colors[], int colorCount,int maxWait, int loops)
+{
+  for(int j = 0; j < loops; j++)
+  {
+    for(int i =0; i < strip.numPixels();i++)
+    {
+      strip.setPixelColor(i,colors[random(0,colorCount-1)]);
+    }
+    strip.show();
+    delay(random(0,maxWait));
+  }
 }
 
 
