@@ -92,9 +92,11 @@ void setup() {
 
 
 void loop() {
-  spinner(red,blue,150,30,true);
-  spinner(red,blue,150,30,false);  
+  cgol(blue,green,1000);
   smiley(black, yellow, 250, false, 1000);  
+  meh(black, green, 250, false, 1000);  
+  frowny(black, blue, 250, false, 1000);   
+
   fireRand(100);
   waterRand(100);
   fireRand(50);
@@ -102,6 +104,9 @@ void loop() {
   fireRand(10);
   waterRand(10);  
   primaryBars();
+  
+  spinner(red,blue,90,20,true);
+  spinner(red,blue,90,20,false);  
   
   flashlight(5000);    
   
@@ -147,7 +152,108 @@ void loop() {
   ants(Color(0,0,255),Color(255,0,0),0);
   rainbow(20);
   rainbowCycle(20);
+
+}
+
+//BE - Conway's Game of Life
+void cgol(uint32_t bgc, uint32_t fgc, int wait)
+{
+  int maxGenerations = 500;
+  randomSeed(analogRead(7));
+  int generations = 0;
+  ringSet(bgc);
+  int grid[26];/* = {0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,1,0,0,0,0,0,1,0,0};*/
+  for(int g=0;g<25;g++)
+  {
+    grid[g] = random(2);
+    Serial.print(grid[g]);
+  }
+  grid[25] = 0;
+
+  //draw initial pattern
+  for(int k=0;k<25;k++)
+  {
+    if(grid[k] == 1)
+    {
+      strip.setPixelColor(k,fgc);
+    }else{
+      strip.setPixelColor(k,bgc);
+    }
+  }
+  strip.show();
+  delay(wait);
+
+  int newGrid[25];
   
+  int n_alive = 0;
+  //n - neighbors - we need to know which neighbors exist for each pod.
+  //this is harder than normal on our board, since there aren't x/y coords to check.
+  //assume each has 8 for easier math.  Set neighbors to 25 (always dead) if they have less than 8 visible.
+  int n[25][8] = {{ 1, 8, 9,25,25,25,25,25},{ 0, 2, 7, 8, 9,25,25,25},{ 1, 3, 6, 7, 8,25,25,25},{ 2, 4, 5, 6, 7,25,25,25},{ 3, 5, 6,25,25,25,25,25},
+                  { 3, 4, 6,13,14,25,25,25},{ 2, 3, 4, 5, 7,12,13,14},{ 1, 2, 3, 6, 8,11,12,13},{ 0, 1, 2, 7, 9,10,11,12},{ 0, 1, 8,10,11,25,25,25},
+                  { 8, 9,11,18,19,25,25,25},{ 7, 8, 9,10,12,17,18,19},{ 6, 7, 8,11,13,16,17,18},{ 5, 6, 7,12,14,15,16,17},{ 5, 6,13,15,16,25,25,25},
+                  {13,14,16,23,24,25,25,25},{12,13,14,15,17,22,23,24},{11,12,13,16,18,21,22,23},{10,11,12,17,19,20,21,22},{10,11,18,20,21,25,25,25},
+                  {18,19,21,25,25,25,25,25},{17,18,19,20,22,25,25,25},{16,17,18,21,23,25,25,25},{15,16,17,22,24,25,25,25},{15,16,23,25,25,25,25,25}};
+  boolean alive = true;                
+  while(alive)
+  {
+    Serial.print("Generation ");
+    Serial.println(generations);    
+    generations++;
+    
+    for(int i=0;i<strip.numPixels();i++)
+    {
+      //how many of my neighbors are alive?
+      n_alive = 0;
+      for(int j=0;j<8;j++)
+      {
+        if(grid[n[i][j]] == 1)
+        {
+          n_alive++;
+        }
+      }
+      Serial.print("Pixel ");
+      Serial.print(i);
+      Serial.print(" has ");
+      Serial.print(n_alive);
+      Serial.println(" living neighbors");
+      //we've checked all 8 neighbors, let's build newGrid with our new statuses.
+      if(n_alive < 2 || n_alive > 3)
+      {
+        newGrid[i] = 0;
+      }
+      if(n_alive == 3)
+      {
+        newGrid[i] = 1;
+      }
+      if(n_alive == 2)
+      {
+        newGrid[i] = grid[i];
+      }
+    }
+
+    //we've built the whole newGrid.
+    //let's check it for life and draw it.  
+    //assume no one is alive and look for negative confirmation.
+    alive = false;
+    
+    for(int k=0;k<strip.numPixels();k++)
+    {
+      grid[k] = newGrid[k];      
+      if(grid[k] == 0)
+      {
+        strip.setPixelColor(k,bgc);
+      }else{
+        strip.setPixelColor(k,fgc);
+        //found at least one alive, the lifeform remains.
+        alive = true;
+      }
+    }
+    strip.show();
+    delay(wait);
+    if(generations > maxGenerations)
+      alive = false;
+  }
 }
 
 //BE - fade entire strand from *c1* to *c2* in *steps* increments with *wait* delay.
@@ -241,7 +347,7 @@ void flashlight(int wait)
   delay(wait);
 }
 
-//BE - this was called OMGBP in L2C.  (Oh My GOD, PONIES!)
+//BE - this was called OMGP in L2C.  (Oh My GOD, PONIES!)
 void primaryBars()
 {
   int rows = 5;
@@ -280,8 +386,27 @@ void primaryBars()
 //BE - say cheese.
 void smiley(uint32_t bc, uint32_t fc, uint8_t wait, boolean reverse, int enddelay )
 {
+  ringSet(bc);
   int pixels[] = {22,14,12,10,9,0,1,2,19,3};
   int pixelCount = 10;
+  colorByNumber(pixels, pixelCount, bc, fc, wait, reverse, enddelay);
+}
+
+//BE - rather not
+void meh(uint32_t bc, uint32_t fc, uint8_t wait, boolean reverse, int enddelay )
+{
+  ringSet(bc);
+  int pixels[] = {22,14,12,2,8,10};
+  int pixelCount = 6;
+  colorByNumber(pixels, pixelCount, bc, fc, wait, reverse, enddelay);
+}
+
+//BE - Nope.
+void frowny(uint32_t bc, uint32_t fc, uint8_t wait, boolean reverse, int enddelay )
+{
+  ringSet(bc);
+  int pixels[] = {22,14,2,7,12,11,10};
+  int pixelCount = 7;
   colorByNumber(pixels, pixelCount, bc, fc, wait, reverse, enddelay);
 }
 
