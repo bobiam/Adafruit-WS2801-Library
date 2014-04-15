@@ -69,6 +69,9 @@ uint32_t indigo = Color(75,0,130);
 uint32_t violet = Color(238,130,238);
 uint32_t white = Color(255,255,255);
 
+//doyoubelieveinmagic?
+uint32_t dybim = white+1;
+
 // Optional: leave off pin numbers to use hardware SPI
 // (pinout is then specific to each board and can't be changed)
 //Adafruit_WS2801 strip = Adafruit_WS2801(25);
@@ -84,6 +87,12 @@ uint32_t white = Color(255,255,255);
 
 void setup() {
   Serial.begin(115200); // Open serial monitor at 115200 baud to see debugs    
+  
+  Serial.println("That 256th RGandB combine to form:");
+  Serial.println(dybim);
+  Serial.println("For reference, white is ");
+  Serial.println(white);
+  
   strip.begin();
 
   // Update LED contents, to start they are all 'off'
@@ -92,10 +101,18 @@ void setup() {
 
 
 void loop() {
-  cgol(blue,green,1000);
-  smiley(black, yellow, 250, false, 1000);  
-  meh(black, green, 250, false, 1000);  
-  frowny(black, blue, 250, false, 1000);   
+  meander(black,dybim,50,true,0);
+  
+  spiral(black ,dybim, 50, false, 0);  
+  spiral(black ,dybim, 50, true, 0);  
+  spiral(red ,dybim, 50, false, 0);  
+  spiral(green ,dybim, 50, true, 0);  
+  spiral(blue ,dybim, 50, false, 0);  
+  
+  cgol(blue,green,500,60);
+  cgol(red,blue,500,60);
+  cgol(orange,black,500,60);
+  cgol(blue,yellow,500,60); 
 
   fireRand(100);
   waterRand(100);
@@ -120,6 +137,8 @@ void loop() {
  
   bang(black, red, 250, false, 1000);  
   smiley(black, yellow, 250, false, 1000);  
+  meh(black, green, 250, false, 1000);  
+  frowny(black, blue, 250, false, 1000);     
   colorWipe(Color(255, 0, 0), 50);
   colorWipe(Color(0, 255, 0), 50);
   colorWipe(Color(0, 0, 255), 50);  
@@ -156,13 +175,12 @@ void loop() {
 }
 
 //BE - Conway's Game of Life
-void cgol(uint32_t bgc, uint32_t fgc, int wait)
+void cgol(uint32_t bgc, uint32_t fgc, int wait, int maxGenerations)
 {
-  int maxGenerations = 500;
   randomSeed(analogRead(7));
   int generations = 0;
   ringSet(bgc);
-  int grid[26];/* = {0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,1,0,0,0,0,0,1,0,0};*/
+  int grid[26];
   for(int g=0;g<25;g++)
   {
     grid[g] = random(2);
@@ -194,10 +212,11 @@ void cgol(uint32_t bgc, uint32_t fgc, int wait)
                   { 8, 9,11,18,19, 5,14,15},{ 7, 8, 9,10,12,17,18,19},{ 6, 7, 8,11,13,16,17,18},{ 5, 6, 7,12,14,15,16,17},{ 5, 6,13,15,16, 9,10,19},
                   {13,14,16,23,24,10,19,20},{12,13,14,15,17,22,23,24},{11,12,13,16,18,21,22,23},{10,11,12,17,19,20,21,22},{10,11,18,20,21,14,15,24},
                   {18,19,21,15,24, 4, 0, 1},{17,18,19,20,22, 0, 1, 2},{16,17,18,21,23, 1, 2, 3},{15,16,17,22,24, 2, 3, 4},{15,16,23, 3, 4, 0,19,20}};
-  boolean alive = true;                
+  boolean alive = true;     
+  boolean same = true;  
   while(alive)
   {
-    Serial.print("Generation ");
+    Serial.println("Generation ");
     Serial.println(generations);    
     generations++;
     
@@ -236,9 +255,12 @@ void cgol(uint32_t bgc, uint32_t fgc, int wait)
     //let's check it for life and draw it.  
     //assume no one is alive and look for negative confirmation.
     alive = false;
+    same = true;
     
     for(int k=0;k<strip.numPixels();k++)
     {
+      if(grid[k] != newGrid[k])
+        same = false;
       grid[k] = newGrid[k];      
       if(grid[k] == 0)
       {
@@ -253,6 +275,18 @@ void cgol(uint32_t bgc, uint32_t fgc, int wait)
     delay(wait);
     if(generations > maxGenerations)
       alive = false;
+    if(same)
+      alive = false;
+  }
+  if(same)
+  {
+    //we reached equilibrium.  Leave it for 5 seconds and show happy face.
+    delay(5000);
+    smiley(black, yellow, 250, false, 1000);  
+  }else{
+    //we died, show the sad face.  
+    delay(2000);
+    frowny(black, blue, 250, false, 1000);   
   }
 }
 
@@ -415,6 +449,19 @@ void spiral(uint32_t bc, uint32_t fc, uint8_t wait, boolean reverse, int enddela
 {
   int pixels[] = {12,17,18,11,8,7,6,13,16,23,22,21,20,19,10,9,0,1,2,3,4,5,14,15,24};
   int pixelCount = 25;
+  colorByNumber(pixels, pixelCount, bc, fc, wait, reverse, enddelay);
+}
+
+//BE - take a pleasant stroll
+void meander(uint32_t bc, uint32_t fc, uint8_t wait, boolean reverse, int enddelay )
+{
+  int pixels[] = { 0, 1, 2, 7,12,11,10, 9, 8, 7,
+                  12,17,18,19,10,11,12,17,22,21,
+                  20,19,18,17,22,23,24,15,14,13,
+                  12,17,16,15,14,5,6,7,12,17,16,
+                  15,14, 5, 4, 3, 2, 7,12,13,14,
+                   5, 6, 7, 8, 9};
+  int pixelCount = 55;
   colorByNumber(pixels, pixelCount, bc, fc, wait, reverse, enddelay);
 }
 
@@ -659,7 +706,12 @@ void colorByNumber(int pixels[],int pixelCount, uint32_t bc, uint32_t fc, uint8_
       Serial.print("pixels[i] is ");
       Serial.println(pixels[i]);
       
-      strip.setPixelColor(pixels[i],fc);
+      if(fc == (white+1))
+      {
+        strip.setPixelColor(pixels[i],Wheel((i+1)*10));
+      }else{
+        strip.setPixelColor(pixels[i],fc);
+      }
       strip.show();   // write all the pixels out
       delay(wait);   
     }  
@@ -668,10 +720,15 @@ void colorByNumber(int pixels[],int pixelCount, uint32_t bc, uint32_t fc, uint8_
     {
       Serial.print("i is: ");
       Serial.print(i);
-      Serial.print("pixels[i] is ");
+      Serial.print("pixels[i] be ");
       Serial.println(pixels[i]);
       
-      strip.setPixelColor(pixels[i],fc);
+      if(fc == (white+1))
+      {
+        strip.setPixelColor(pixels[i],Wheel((i+1)*10));
+      }else{
+        strip.setPixelColor(pixels[i],fc);
+      }
       strip.show();   // write all the pixels out
       delay(wait);   
     }
