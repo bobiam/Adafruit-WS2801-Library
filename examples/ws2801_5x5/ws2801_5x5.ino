@@ -1,7 +1,7 @@
 #include "SPI.h"
 #include "Adafruit_WS2801.h"
 /*
-  ws2808play - a collection of patterns written for a 5x5 square, by Bob Eells (!Bob) for a display he built for Flipside 2014.
+  ws2808play - a collection of patterns written for a 5x5 square, by Bob Eells (!Bob) for a display I built for Flipside 2014.
   Intention is to have the square rotated 45 degrees (diamond display) - some patterns (smiley face, for example) are only upright on a diagonal.
   pods are laid out in rows, back and forth.  Pod 24 is north.  The diagram looks like:
   
@@ -10,6 +10,8 @@
   14 13 12 11 10
   05 06 07 08 09
   04 03 02 01 00
+  
+  With 24 at the top of the diamond.  The whole thing is powered off of a teensy 2.0 and is a wearable piece running off of two usb ports on a 10,000mAh rechargable battery.
   
   Modified heavily from the original Adafruit WS2801 example below.
   
@@ -69,6 +71,12 @@ uint32_t indigo = Color(75,0,130);
 uint32_t violet = Color(238,130,238);
 uint32_t white = Color(255,255,255);
 
+//conway's presets
+int cgol_emptyPixels[] = {};
+int cgol_glider[] = {0,0,1,0,0, 1,0,1,0,0, 0,0,1,1,0, 0,0,0,0,0, 0,0,0,0,0};
+int cgol_rpento[] = {0,0,0,0,0, 0,1,0,0,0, 0,0,1,1,1, 0,0,0,0,0, 0,0,0,0,0};
+int cgol_infinite2[] = {1,0,0,1,1, 1,0,0,1,0, 1,1,0,0,1, 0,0,1,0,0, 1,1,1,0,1};
+
 //doyoubelieveinmagic?
 uint32_t dybim = white+1;
 
@@ -101,19 +109,19 @@ void setup() {
 
 
 void loop() {
-  meander(black,dybim,50,true,0);
-  
   spiral(black ,dybim, 50, false, 0);  
+  cgol(black,green,500,60,cgol_infinite2,true);
+  cgol(black,yellow,100,60,cgol_glider,true);
+  spiral(red ,orange, 50, false, 0);  
+  meander(black,dybim,50,true,0);
   spiral(black ,dybim, 50, true, 0);  
   spiral(red ,dybim, 50, false, 0);  
   spiral(green ,dybim, 50, true, 0);  
   spiral(blue ,dybim, 50, false, 0);  
-  
-  cgol(blue,green,500,60);
-  cgol(red,blue,500,60);
-  cgol(orange,black,500,60);
-  cgol(blue,yellow,500,60); 
-
+  cgol(blue,green,500,60,cgol_emptyPixels, false);
+  cgol(red,blue,500,60,cgol_emptyPixels, false);
+  cgol(orange,black,500,60,cgol_emptyPixels, false);
+  cgol(blue,yellow,500,60,cgol_emptyPixels, false);
   fireRand(100);
   waterRand(100);
   fireRand(50);
@@ -121,12 +129,9 @@ void loop() {
   fireRand(10);
   waterRand(10);  
   primaryBars();
-  
   spinner(red,blue,90,20,true);
   spinner(red,blue,90,20,false);  
-  
   flashlight(5000);    
-  
   fade(red,orange,100,100);
   fade(orange,yellow,100,100);
   fade(yellow,green,100,100);
@@ -134,7 +139,6 @@ void loop() {
   fade(blue,indigo,100,100);
   fade(indigo,violet,100,100);
   fade(violet,red,100,100);
- 
   bang(black, red, 250, false, 1000);  
   smiley(black, yellow, 250, false, 1000);  
   meh(black, green, 250, false, 1000);  
@@ -171,20 +175,24 @@ void loop() {
   ants(Color(0,0,255),Color(255,0,0),0);
   rainbow(20);
   rainbowCycle(20);
-
 }
 
 //BE - Conway's Game of Life
-void cgol(uint32_t bgc, uint32_t fgc, int wait, int maxGenerations)
+void cgol(uint32_t bgc, uint32_t fgc, int wait, int maxGenerations, int pixels[], boolean usePixels)
 {
   randomSeed(analogRead(7));
   int generations = 0;
   ringSet(bgc);
+  
   int grid[26];
   for(int g=0;g<25;g++)
   {
-    grid[g] = random(2);
-    Serial.print(grid[g]);
+    if(usePixels)
+    {
+      grid[g] = pixels[g];
+    }else{
+      grid[g] = random(2);
+    }
   }
   grid[25] = 0;
 
@@ -278,9 +286,9 @@ void cgol(uint32_t bgc, uint32_t fgc, int wait, int maxGenerations)
     if(same)
       alive = false;
   }
-  if(same)
+  if(same || (generations > maxGenerations))
   {
-    //we reached equilibrium.  Leave it for 5 seconds and show happy face.
+    //we reached equilibrium or we were still alive through maxGenerations generations.  Leave it for 5 seconds and show happy face.
     delay(5000);
     smiley(black, yellow, 250, false, 1000);  
   }else{
