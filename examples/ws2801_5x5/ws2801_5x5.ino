@@ -77,6 +77,60 @@ int cgol_glider[] = {0,0,1,0,0, 1,0,1,0,0, 0,0,1,1,0, 0,0,0,0,0, 0,0,0,0,0};
 int cgol_rpento[] = {0,0,0,0,0, 0,1,0,0,0, 0,0,1,1,1, 0,0,0,0,0, 0,0,0,0,0};
 int cgol_infinite2[] = {1,0,0,1,1, 1,0,0,1,0, 1,1,0,0,1, 0,0,1,0,0, 1,1,1,0,1};
 
+  //letters
+  int l_a[] = {0,1,2,3,4,5,7,14,12,15,17,24,23,22,21,20};
+  int l_a_count = 16;
+  int l_b[] = {0,1,2,3,4,5,7,9,14,12,10,15,17,19,24,23,21,20};
+  int l_b_count = 18;
+  int l_c[] = {24,15,14,5,4,3,2,1,0,9,10,19,20};
+  int l_c_count = 13;
+  int l_d[] = {0,1,2,3,4,9,5,10,14,19,15,21,22,23};
+  int l_d_count = 14;
+  int l_e[] = {0,1,2,3,4,5,14,15,24,7,12,9,10,19,20};
+  int l_e_count = 15;
+  int l_f[] = {0,1,2,3,4,5,14,15,24,7,12};
+  int l_f_count = 11;
+  int l_g[] = {24,15,14,5,4,3,2,1,0,9,10,19,20,21,22,17,12};
+  int l_g_count = 17;
+  int l_h[] = {0,1,2,3,4,7,12,17,24,23,22,21,20};
+  int l_h_count = 13;
+  int l_i[] = {14,13,12,11,10};
+  int l_i_count = 5;
+  int l_j[] = {1,0,9,10,19,20,21,22,23,24};
+  int l_j_count = 10;
+  int l_k[] = {0,1,2,3,4,7,13,11,15,19};
+  int l_k_count = 10;
+  int l_l[] = {0,1,2,3,4,9,10,19,20};
+  int l_l_count = 9;
+  int l_m[] = {0,1,2,3,4,6,12,16,24,23,22,21,20};
+  int l_m_count = 13;
+  int l_n[] = {0,1,2,3,4,6,12,18,24,23,22,21,20};
+  int l_n_count = 13;
+  int l_o[] = {0,1,2,3,4,5,14,15,24,23,22,21,20,19,10,9};
+  int l_o_count = 16;
+  int l_p[] = {0,1,2,3,4,5,7,14,12,15,17,24,23,22};
+  int l_p_count = 14;
+  int l_q[] = {0,1,2,3,4,5,14,15,24,23,22,21,20,19,10,9,18};
+  int l_q_count = 19;
+  int l_r[] = {0,1,2,3,4,5,14,15,24,7,12,23,17,18,20};
+  int l_r_count = 15;
+  int l_s[] = {24,15,14,5,4,3,2,7,12,17,22,21,20,19,10,9,0};
+  int l_s_count = 17;
+  int l_t[] = {4,5,14,15,24,13,12,11,10};
+  int l_t_count = 9;
+  int l_u[] = {4,3,2,1,0,9,10,19,20,21,22,23,24};
+  int l_u_count = 13;
+  int l_v[] = {4,3,2,8,10,18,22,23,24};
+  int l_v_count = 9;
+  int l_w[] = {4,3,2,1,9,11,12,13,14,19,21,22,23,24};
+  int l_w_count = 14;
+  int l_x[] = {4,6,12,18,20,24,16,8,0};
+  int l_x_count = 9;
+  int l_y[] = {4,6,12,11,10,16,24};
+  int l_y_count = 7;
+  int l_z[] = {4,5,14,15,24,16,12,8,0,9,10,19,20};
+  int l_z_count = 13;  
+
 //doyoubelieveinmagic?
 uint32_t dybim = white+1;
 
@@ -95,33 +149,29 @@ uint32_t dybim = white+1;
 
 void setup() {
   Serial.begin(115200); // Open serial monitor at 115200 baud to see debugs    
-  
-  Serial.println("That 256th RGandB combine to form:");
-  Serial.println(dybim);
-  Serial.println("For reference, white is ");
-  Serial.println(white);
-  
   strip.begin();
-
   // Update LED contents, to start they are all 'off'
   strip.show();
 }
 
 
 void loop() {
-  spiral(black ,dybim, 50, false, 0);  
-  cgol(black,green,500,60,cgol_infinite2,true);
-  cgol(black,yellow,100,60,cgol_glider,true);
-  spiral(red ,orange, 50, false, 0);  
-  meander(black,dybim,50,true,0);
-  spiral(black ,dybim, 50, true, 0);  
-  spiral(red ,dybim, 50, false, 0);  
-  spiral(green ,dybim, 50, true, 0);  
-  spiral(blue ,dybim, 50, false, 0);  
-  cgol(blue,green,500,60,cgol_emptyPixels, false);
-  cgol(red,blue,500,60,cgol_emptyPixels, false);
-  cgol(orange,black,500,60,cgol_emptyPixels, false);
-  cgol(blue,yellow,500,60,cgol_emptyPixels, false);
+  letters(black,green,500);
+  the_hoff(black ,red, 150, true, 0);  
+  spiral(black ,dybim, 50, false, 0, true);  
+  cgol(black,green,500,60,cgol_infinite2, true, false);
+  cgol(black,yellow,100,60,cgol_glider, true, false);
+  spiral(red ,orange, 50, false, 0, false);  
+  meander(black,dybim,50,true,0,false);
+  meander(black,dybim,50,true,0,true);  
+  spiral(black ,dybim, 50, true, 0, false);  
+  spiral(red ,dybim, 50, false, 0, true);  
+  spiral(green ,dybim, 50, true, 0, false);  
+  spiral(blue ,dybim, 50, false, 0, true);  
+  cgol(blue,green,500,60,cgol_emptyPixels, false, true);
+  cgol(red,blue,500,60,cgol_emptyPixels, false, true);
+  cgol(orange,black,500,60,cgol_emptyPixels, false, true);
+  cgol(blue,yellow,500,60,cgol_emptyPixels, false, true);
   fireRand(100);
   waterRand(100);
   fireRand(50);
@@ -147,18 +197,18 @@ void loop() {
   colorWipe(Color(0, 255, 0), 50);
   colorWipe(Color(0, 0, 255), 50);  
   bulls(red,green,blue,250,20);  
-  spiral(orangered, blue, 50, false, 0);
-  spiral(orangered, blue, 50, true, 0);  
+  spiral(orangered, blue, 50, false, 0, false);
+  spiral(orangered, blue, 50, true, 0, false);  
   smiley(green, blue, 50, false, 0);
   smiley(blue ,green, 50, false, 0);    
-  spiral(orangered, blue, 50, false, 0);
-  spiral(blue ,orangered, 50, false, 0);  
-  spiral(orangered, blue, 50, true, 0);
-  spiral(blue ,orangered, 50, true, 0);    
-  spiral(orangered, blue, 50, false, 0);
-  spiral(orangered, blue, 50, true, 0);  
-  spiral(blue ,orangered, 50, false, 0);    
-  spiral(blue ,orangered, 50, true, 0);    
+  spiral(orangered, blue, 50, false, 0, false);
+  spiral(blue ,orangered, 50, false, 0, false);
+  spiral(orangered, blue, 50, true, 0, false);
+  spiral(blue ,orangered, 50, true, 0, false); 
+  spiral(orangered, blue, 50, false, 0, false);
+  spiral(orangered, blue, 50, true, 0, false); 
+  spiral(blue ,orangered, 50, false, 0, false);
+  spiral(blue ,orangered, 50, true, 0, false); 
   ants(Color(0,255,0),Color(0,0,0),500);  
   allBlink(10, Color(255,0,0), Color(0,0,0), 500);
   randommy();
@@ -177,8 +227,91 @@ void loop() {
   rainbowCycle(20);
 }
 
+//BE - text 
+void letters(uint32_t bgc, uint32_t fgc, int wait)
+{
+  ringSet(bgc);
+  setPixelGroup(l_a, l_a_count, fgc);
+  delay(wait);
+  ringSet(bgc);
+  setPixelGroup(l_b, l_b_count, fgc);
+  delay(wait);
+  ringSet(bgc);
+  setPixelGroup(l_c, l_c_count, fgc);
+  delay(wait);  
+  ringSet(bgc);
+  setPixelGroup(l_d, l_d_count, fgc);
+  delay(wait);  
+  ringSet(bgc);
+  setPixelGroup(l_e, l_e_count, fgc);
+  delay(wait);  
+  ringSet(bgc);
+  setPixelGroup(l_f, l_f_count, fgc);
+  delay(wait);  
+  ringSet(bgc);
+  setPixelGroup(l_g, l_g_count, fgc);
+  delay(wait);  
+  ringSet(bgc);
+  setPixelGroup(l_h, l_h_count, fgc);
+  delay(wait);    
+  ringSet(bgc);
+  setPixelGroup(l_i, l_i_count, fgc);
+  delay(wait);    
+  ringSet(bgc);
+  setPixelGroup(l_j, l_j_count, fgc);
+  delay(wait);    
+  ringSet(bgc);
+  setPixelGroup(l_k, l_k_count, fgc);
+  delay(wait);    
+  ringSet(bgc);
+  setPixelGroup(l_l, l_l_count, fgc);
+  delay(wait);    
+  ringSet(bgc);
+  setPixelGroup(l_m, l_m_count, fgc);
+  delay(wait);    
+  ringSet(bgc);
+  setPixelGroup(l_n, l_n_count, fgc);
+  delay(wait);    
+  ringSet(bgc);
+  setPixelGroup(l_o, l_o_count, fgc);
+  delay(wait);    
+  ringSet(bgc);
+  setPixelGroup(l_p, l_p_count, fgc);
+  delay(wait);    
+  ringSet(bgc);
+  setPixelGroup(l_q, l_q_count, fgc);
+  delay(wait);    
+  ringSet(bgc);
+  setPixelGroup(l_r, l_r_count, fgc);
+  delay(wait);    
+  ringSet(bgc);
+  setPixelGroup(l_s, l_s_count, fgc);
+  delay(wait);    
+  ringSet(bgc);
+  setPixelGroup(l_t, l_t_count, fgc);
+  delay(wait);    
+  ringSet(bgc);
+  setPixelGroup(l_u, l_u_count, fgc);
+  delay(wait);    
+  ringSet(bgc);
+  setPixelGroup(l_v, l_v_count, fgc);
+  delay(wait);    
+  ringSet(bgc);
+  setPixelGroup(l_w, l_w_count, fgc);
+  delay(wait);    
+  ringSet(bgc);
+  setPixelGroup(l_x, l_x_count, fgc);
+  delay(wait);    
+  ringSet(bgc);
+  setPixelGroup(l_y, l_y_count, fgc);
+  delay(wait);    
+  ringSet(bgc);
+  setPixelGroup(l_z, l_z_count, fgc);
+  delay(wait);      
+}
+
 //BE - Conway's Game of Life
-void cgol(uint32_t bgc, uint32_t fgc, int wait, int maxGenerations, int pixels[], boolean usePixels)
+void cgol(uint32_t bgc, uint32_t fgc, int wait, int maxGenerations, int pixels[], boolean usePixels, boolean emote)
 {
   randomSeed(analogRead(7));
   int generations = 0;
@@ -286,15 +419,18 @@ void cgol(uint32_t bgc, uint32_t fgc, int wait, int maxGenerations, int pixels[]
     if(same)
       alive = false;
   }
-  if(same || (generations > maxGenerations))
+  if(emote)
   {
-    //we reached equilibrium or we were still alive through maxGenerations generations.  Leave it for 5 seconds and show happy face.
-    delay(5000);
-    smiley(black, yellow, 250, false, 1000);  
-  }else{
-    //we died, show the sad face.  
-    delay(2000);
-    frowny(black, blue, 250, false, 1000);   
+    if(same || (generations > maxGenerations))
+    {
+      //we reached equilibrium or we were still alive through maxGenerations generations.  Leave it for 5 seconds and show happy face.
+      delay(5000);
+      smiley(black, yellow, 250, false, 1000);  
+    }else{
+      //we died, show the sad face.  
+      delay(2000);
+      frowny(black, blue, 250, false, 1000);   
+    }
   }
 }
 
@@ -431,7 +567,7 @@ void smiley(uint32_t bc, uint32_t fc, uint8_t wait, boolean reverse, int enddela
   ringSet(bc);
   int pixels[] = {22,14,12,10,9,0,1,2,19,3};
   int pixelCount = 10;
-  colorByNumber(pixels, pixelCount, bc, fc, wait, reverse, enddelay);
+  colorByNumber(pixels, pixelCount, bc, fc, wait, reverse, enddelay, false);
 }
 
 //BE - rather not
@@ -440,7 +576,7 @@ void meh(uint32_t bc, uint32_t fc, uint8_t wait, boolean reverse, int enddelay )
   ringSet(bc);
   int pixels[] = {22,14,12,2,8,10};
   int pixelCount = 6;
-  colorByNumber(pixels, pixelCount, bc, fc, wait, reverse, enddelay);
+  colorByNumber(pixels, pixelCount, bc, fc, wait, reverse, enddelay, false);
 }
 
 //BE - Nope.
@@ -449,19 +585,27 @@ void frowny(uint32_t bc, uint32_t fc, uint8_t wait, boolean reverse, int enddela
   ringSet(bc);
   int pixels[] = {22,14,2,7,12,11,10};
   int pixelCount = 7;
-  colorByNumber(pixels, pixelCount, bc, fc, wait, reverse, enddelay);
+  colorByNumber(pixels, pixelCount, bc, fc, wait, reverse, enddelay, false);
 }
 
 //BE - nice animated spiral
-void spiral(uint32_t bc, uint32_t fc, uint8_t wait, boolean reverse, int enddelay )
+void spiral(uint32_t bc, uint32_t fc, uint8_t wait, boolean reverse, int enddelay, boolean clears )
 {
   int pixels[] = {12,17,18,11,8,7,6,13,16,23,22,21,20,19,10,9,0,1,2,3,4,5,14,15,24};
   int pixelCount = 25;
-  colorByNumber(pixels, pixelCount, bc, fc, wait, reverse, enddelay);
+  colorByNumber(pixels, pixelCount, bc, fc, wait, reverse, enddelay, clears);
+}
+
+//BE - nice animated spiral
+void the_hoff(uint32_t bc, uint32_t fc, uint8_t wait, boolean reverse, int enddelay )
+{
+  int pixels[] = {4,6,12,18,20,18,12,6,4,6,12,18,20,18,12,6};
+  int pixelCount = 16;
+  colorByNumber(pixels, pixelCount, bc, fc, wait, reverse, enddelay, true);
 }
 
 //BE - take a pleasant stroll
-void meander(uint32_t bc, uint32_t fc, uint8_t wait, boolean reverse, int enddelay )
+void meander(uint32_t bc, uint32_t fc, uint8_t wait, boolean reverse, int enddelay, boolean clears )
 {
   int pixels[] = { 0, 1, 2, 7,12,11,10, 9, 8, 7,
                   12,17,18,19,10,11,12,17,22,21,
@@ -470,7 +614,7 @@ void meander(uint32_t bc, uint32_t fc, uint8_t wait, boolean reverse, int enddel
                   15,14, 5, 4, 3, 2, 7,12,13,14,
                    5, 6, 7, 8, 9};
   int pixelCount = 55;
-  colorByNumber(pixels, pixelCount, bc, fc, wait, reverse, enddelay);
+  colorByNumber(pixels, pixelCount, bc, fc, wait, reverse, enddelay, clears);
 }
 
 //BE - Bulls is intentionally truncated from one of two possible names.
@@ -700,7 +844,7 @@ void decodeColor(uint32_t c, byte ret[])
 
 //BE - pass an array of pixels to this and it'll draw them out in order, with *wait* in ms between each pixel.
 //reverse draws it backwards, useful for animation.
-void colorByNumber(int pixels[],int pixelCount, uint32_t bc, uint32_t fc, uint8_t wait, boolean reverse, int enddelay)
+void colorByNumber(int pixels[],int pixelCount, uint32_t bc, uint32_t fc, uint8_t wait, boolean reverse, int enddelay, boolean clears)
 {
   int i;
   //set bgcolor
@@ -709,6 +853,8 @@ void colorByNumber(int pixels[],int pixelCount, uint32_t bc, uint32_t fc, uint8_
   {
     for(i=0;i<pixelCount;i++)
     {
+      if(clears)
+        ringSet(bc);
       Serial.print("i is: ");
       Serial.print(i);
       Serial.print("pixels[i] is ");
@@ -726,6 +872,8 @@ void colorByNumber(int pixels[],int pixelCount, uint32_t bc, uint32_t fc, uint8_
   }else{
     for(i=pixelCount;i>-1;i--)
     {
+      if(clears)
+        ringSet(bc);
       Serial.print("i is: ");
       Serial.print(i);
       Serial.print("pixels[i] be ");
@@ -761,6 +909,6 @@ void bang(uint32_t bc, uint32_t fc, uint8_t wait, boolean reverse, int enddelay 
 {
   int pixels[] = {24,23,15,16,17,13,12,8,9,1,0};
   int pixelCount = 11;
-  colorByNumber(pixels, pixelCount, bc, fc, wait, reverse, enddelay);  
+  colorByNumber(pixels, pixelCount, bc, fc, wait, reverse, enddelay, false);  
 }
 
