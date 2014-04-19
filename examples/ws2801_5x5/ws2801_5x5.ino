@@ -70,6 +70,16 @@ uint32_t seagreen = Color(84,255,159);
 uint32_t indigo = Color(75,0,130);
 uint32_t violet = Color(238,130,238);
 uint32_t white = Color(255,255,255);
+uint32_t darkgreen = Color(0,100,0);
+uint32_t forestgreen = Color(34,139,34);
+uint32_t darkslategray = Color(47,79,79);
+uint32_t darkolivegreen = Color(85,107,47);
+uint32_t shipcove = Color(115,138,189);
+uint32_t poloblue = Color(118,149,200);
+uint32_t deepblue = Color(0,11,76);
+
+uint32_t named_colors[] = {orangered,orange,black,red,green,blue,yellow,seagreen,indigo,violet,white,darkgreen,forestgreen,darkslategray,darkolivegreen,shipcove,poloblue,deepblue};
+int named_colors_count = 18;
 
 //conway's presets
 int cgol_emptyPixels[] = {};
@@ -77,59 +87,33 @@ int cgol_glider[] = {0,0,1,0,0, 1,0,1,0,0, 0,0,1,1,0, 0,0,0,0,0, 0,0,0,0,0};
 int cgol_rpento[] = {0,0,0,0,0, 0,1,0,0,0, 0,0,1,1,1, 0,0,0,0,0, 0,0,0,0,0};
 int cgol_infinite2[] = {1,0,0,1,1, 1,0,0,1,0, 1,1,0,0,1, 0,0,1,0,0, 1,1,1,0,1};
 
-  //letters
-  int l_a[] = {0,1,2,3,4,5,7,14,12,15,17,24,23,22,21,20};
-  int l_a_count = 16;
-  int l_b[] = {0,1,2,3,4,5,7,9,14,12,10,15,17,19,24,23,21,20};
-  int l_b_count = 18;
-  int l_c[] = {24,15,14,5,4,3,2,1,0,9,10,19,20};
-  int l_c_count = 13;
-  int l_d[] = {0,1,2,3,4,9,5,10,14,19,15,21,22,23};
-  int l_d_count = 14;
-  int l_e[] = {0,1,2,3,4,5,14,15,24,7,12,9,10,19,20};
-  int l_e_count = 15;
-  int l_f[] = {0,1,2,3,4,5,14,15,24,7,12};
-  int l_f_count = 11;
-  int l_g[] = {24,15,14,5,4,3,2,1,0,9,10,19,20,21,22,17,12};
-  int l_g_count = 17;
-  int l_h[] = {0,1,2,3,4,7,12,17,24,23,22,21,20};
-  int l_h_count = 13;
-  int l_i[] = {14,13,12,11,10};
-  int l_i_count = 5;
-  int l_j[] = {1,0,9,10,19,20,21,22,23,24};
-  int l_j_count = 10;
-  int l_k[] = {0,1,2,3,4,7,13,11,15,19};
-  int l_k_count = 10;
-  int l_l[] = {0,1,2,3,4,9,10,19,20};
-  int l_l_count = 9;
-  int l_m[] = {0,1,2,3,4,6,12,16,24,23,22,21,20};
-  int l_m_count = 13;
-  int l_n[] = {0,1,2,3,4,6,12,18,24,23,22,21,20};
-  int l_n_count = 13;
-  int l_o[] = {0,1,2,3,4,5,14,15,24,23,22,21,20,19,10,9};
-  int l_o_count = 16;
-  int l_p[] = {0,1,2,3,4,5,7,14,12,15,17,24,23,22};
-  int l_p_count = 14;
-  int l_q[] = {0,1,2,3,4,5,14,15,24,23,22,21,20,19,10,9,18};
-  int l_q_count = 19;
-  int l_r[] = {0,1,2,3,4,5,14,15,24,7,12,23,17,18,20};
-  int l_r_count = 15;
-  int l_s[] = {24,15,14,5,4,3,2,7,12,17,22,21,20,19,10,9,0};
-  int l_s_count = 17;
-  int l_t[] = {4,5,14,15,24,13,12,11,10};
-  int l_t_count = 9;
-  int l_u[] = {4,3,2,1,0,9,10,19,20,21,22,23,24};
-  int l_u_count = 13;
-  int l_v[] = {4,3,2,8,10,18,22,23,24};
-  int l_v_count = 9;
-  int l_w[] = {4,3,2,1,9,11,12,13,14,19,21,22,23,24};
-  int l_w_count = 14;
-  int l_x[] = {4,6,12,18,20,24,16,8,0};
-  int l_x_count = 9;
-  int l_y[] = {4,6,12,11,10,16,24};
-  int l_y_count = 7;
-  int l_z[] = {4,5,14,15,24,16,12,8,0,9,10,19,20};
-  int l_z_count = 13;  
+//letters
+int l_a[] = {0,1,2,3,4,5,7,14,12,15,17,24,23,22,21,20};
+int l_b[] = {0,1,2,3,4,5,7,9,14,12,10,15,17,19,24,23,21,20};
+int l_c[] = {24,15,14,5,4,3,2,1,0,9,10,19,20};
+int l_d[] = {0,1,2,3,4,9,5,10,14,19,15,21,22,23};
+int l_e[] = {0,1,2,3,4,5,14,15,24,7,12,9,10,19,20};
+int l_f[] = {0,1,2,3,4,5,14,15,24,7,12};
+int l_g[] = {24,15,14,5,4,3,2,1,0,9,10,19,20,21,22,17,12};
+int l_h[] = {0,1,2,3,4,7,12,17,24,23,22,21,20};
+int l_i[] = {14,13,12,11,10};
+int l_j[] = {1,0,9,10,19,20,21,22,23,24};
+int l_k[] = {0,1,2,3,4,7,13,11,15,19};
+int l_l[] = {0,1,2,3,4,9,10,19,20};
+int l_m[] = {0,1,2,3,4,6,12,16,24,23,22,21,20};
+int l_n[] = {0,1,2,3,4,6,12,18,24,23,22,21,20};
+int l_o[] = {0,1,2,3,4,5,14,15,24,23,22,21,20,19,10,9};
+int l_p[] = {0,1,2,3,4,5,7,14,12,15,17,24,23,22};
+int l_q[] = {0,1,2,3,4,5,14,15,24,23,22,21,20,19,10,9,18};
+int l_r[] = {0,1,2,3,4,5,14,15,24,7,12,23,17,18,20};
+int l_s[] = {24,15,14,5,4,3,2,7,12,17,22,21,20,19,10,9,0};
+int l_t[] = {4,5,14,15,24,13,12,11,10};
+int l_u[] = {4,3,2,1,0,9,10,19,20,21,22,23,24};
+int l_v[] = {4,3,2,8,10,18,22,23,24};
+int l_w[] = {4,3,2,1,9,11,12,13,14,19,21,22,23,24};
+int l_x[] = {4,6,12,18,20,24,16,8,0};
+int l_y[] = {4,6,12,11,10,16,24};
+int l_z[] = {4,5,14,15,24,16,12,8,0,9,10,19,20};
 
 //doyoubelieveinmagic?
 uint32_t dybim = white+1;
@@ -156,8 +140,27 @@ void setup() {
 
 
 void loop() {
-  letters(black,green,500);
-  the_hoff(black ,red, 150, true, 0);  
+  hello(black,green,500);  
+  cylon(100);  
+  smiley(black, yellow, 250, false, 1000);  
+  meh(black, green, 250, false, 1000);  
+  frowny(black, blue, 250, false, 1000);   
+  the_hoff(black ,red, 150);    
+  airRand(100);
+  earthRand(100);
+  fireRand(100);
+  waterRand(100);
+  airRand(50);
+  earthRand(50);
+  fireRand(50);
+  waterRand(50); 
+  airRand(10);  
+  earthRand(10);
+  fireRand(10);
+  waterRand(10);  
+  primaryBars();  
+  alphabet(named_colors[random(0,named_colors_count)],named_colors[random(0,named_colors_count)],500);
+  the_hoff(black ,red, 150);  
   spiral(black ,dybim, 50, false, 0, true);  
   cgol(black,green,500,60,cgol_infinite2, true, false);
   cgol(black,yellow,100,60,cgol_glider, true, false);
@@ -172,13 +175,6 @@ void loop() {
   cgol(red,blue,500,60,cgol_emptyPixels, false, true);
   cgol(orange,black,500,60,cgol_emptyPixels, false, true);
   cgol(blue,yellow,500,60,cgol_emptyPixels, false, true);
-  fireRand(100);
-  waterRand(100);
-  fireRand(50);
-  waterRand(50);  
-  fireRand(10);
-  waterRand(10);  
-  primaryBars();
   spinner(red,blue,90,20,true);
   spinner(red,blue,90,20,false);  
   flashlight(5000);    
@@ -227,86 +223,106 @@ void loop() {
   rainbowCycle(20);
 }
 
-//BE - text 
-void letters(uint32_t bgc, uint32_t fgc, int wait)
+//BE - hello
+void hello(uint32_t bgc, uint32_t fgc, int wait)
 {
   ringSet(bgc);
-  setPixelGroup(l_a, l_a_count, fgc);
+  setPixelGroup(l_h, sizeof(l_h)/sizeof(int), fgc);
   delay(wait);
   ringSet(bgc);
-  setPixelGroup(l_b, l_b_count, fgc);
+  setPixelGroup(l_e, sizeof(l_e)/sizeof(int), fgc);
   delay(wait);
   ringSet(bgc);
-  setPixelGroup(l_c, l_c_count, fgc);
+  setPixelGroup(l_l, sizeof(l_l)/sizeof(int), fgc);
+  delay(wait);
+  ringSet(bgc);
+  setPixelGroup(l_l, sizeof(l_l)/sizeof(int), fgc);
+  delay(wait);
+  ringSet(bgc);
+  setPixelGroup(l_o, sizeof(l_o)/sizeof(int), fgc);
+  delay(wait);
+}
+
+//BE - text 
+void alphabet(uint32_t bgc, uint32_t fgc, int wait)
+{
+  ringSet(bgc);
+  setPixelGroup(l_a, sizeof(l_a)/sizeof(int), fgc);
+  delay(wait);
+  ringSet(bgc);
+  setPixelGroup(l_b, sizeof(l_b)/sizeof(int), fgc);
+  delay(wait);
+  ringSet(bgc);
+  setPixelGroup(l_c, sizeof(l_c)/sizeof(int), fgc);
   delay(wait);  
   ringSet(bgc);
-  setPixelGroup(l_d, l_d_count, fgc);
+  setPixelGroup(l_d, sizeof(l_d)/sizeof(int), fgc);
   delay(wait);  
   ringSet(bgc);
-  setPixelGroup(l_e, l_e_count, fgc);
+  setPixelGroup(l_e, sizeof(l_e)/sizeof(int), fgc);
   delay(wait);  
   ringSet(bgc);
-  setPixelGroup(l_f, l_f_count, fgc);
+  setPixelGroup(l_f, sizeof(l_f)/sizeof(int), fgc);
   delay(wait);  
   ringSet(bgc);
-  setPixelGroup(l_g, l_g_count, fgc);
+  setPixelGroup(l_g, sizeof(l_g)/sizeof(int), fgc);
   delay(wait);  
   ringSet(bgc);
-  setPixelGroup(l_h, l_h_count, fgc);
+  setPixelGroup(l_h, sizeof(l_h)/sizeof(int), fgc);
   delay(wait);    
   ringSet(bgc);
-  setPixelGroup(l_i, l_i_count, fgc);
+  setPixelGroup(l_i, sizeof(l_i)/sizeof(int), fgc);
   delay(wait);    
   ringSet(bgc);
-  setPixelGroup(l_j, l_j_count, fgc);
+  setPixelGroup(l_j, sizeof(l_j)/sizeof(int), fgc);
   delay(wait);    
   ringSet(bgc);
-  setPixelGroup(l_k, l_k_count, fgc);
+  setPixelGroup(l_k, sizeof(l_k)/sizeof(int), fgc);
   delay(wait);    
   ringSet(bgc);
-  setPixelGroup(l_l, l_l_count, fgc);
+  setPixelGroup(l_l, sizeof(l_l)/sizeof(int), fgc);
   delay(wait);    
   ringSet(bgc);
-  setPixelGroup(l_m, l_m_count, fgc);
+  setPixelGroup(l_m, sizeof(l_m)/sizeof(int), fgc);
   delay(wait);    
   ringSet(bgc);
-  setPixelGroup(l_n, l_n_count, fgc);
+  setPixelGroup(l_n, sizeof(l_n)/sizeof(int), fgc);
   delay(wait);    
   ringSet(bgc);
-  setPixelGroup(l_o, l_o_count, fgc);
+  setPixelGroup(l_o, sizeof(l_o)/sizeof(int), fgc);
   delay(wait);    
   ringSet(bgc);
-  setPixelGroup(l_p, l_p_count, fgc);
+  setPixelGroup(l_p, sizeof(l_p)/sizeof(int), fgc);
   delay(wait);    
   ringSet(bgc);
-  setPixelGroup(l_q, l_q_count, fgc);
+  setPixelGroup(l_q, sizeof(l_q)/sizeof(int), fgc);
   delay(wait);    
   ringSet(bgc);
-  setPixelGroup(l_r, l_r_count, fgc);
+  setPixelGroup(l_r, sizeof(l_r)/sizeof(int), fgc);
   delay(wait);    
   ringSet(bgc);
-  setPixelGroup(l_s, l_s_count, fgc);
+  setPixelGroup(l_s, sizeof(l_s)/sizeof(int), fgc);
   delay(wait);    
   ringSet(bgc);
-  setPixelGroup(l_t, l_t_count, fgc);
+  setPixelGroup(l_t, sizeof(l_t)/sizeof(int), fgc);
   delay(wait);    
   ringSet(bgc);
-  setPixelGroup(l_u, l_u_count, fgc);
+  setPixelGroup(l_u, sizeof(l_u)/sizeof(int), fgc);
   delay(wait);    
   ringSet(bgc);
-  setPixelGroup(l_v, l_v_count, fgc);
+  setPixelGroup(l_v, sizeof(l_v)/sizeof(int), fgc);
   delay(wait);    
   ringSet(bgc);
-  setPixelGroup(l_w, l_w_count, fgc);
+  setPixelGroup(l_w, sizeof(l_w)/sizeof(int), fgc);
   delay(wait);    
   ringSet(bgc);
-  setPixelGroup(l_x, l_x_count, fgc);
+  setPixelGroup(l_x, sizeof(l_x)/sizeof(int), fgc);
   delay(wait);    
   ringSet(bgc);
-  setPixelGroup(l_y, l_y_count, fgc);
+  setPixelGroup(l_y, sizeof(l_y)/sizeof(int), fgc);
   delay(wait);    
   ringSet(bgc);
-  setPixelGroup(l_z, l_z_count, fgc);
+  setPixelGroup(l_z, sizeof(l_z)/sizeof(int), fgc);
   delay(wait);      
 }
 
@@ -500,7 +516,25 @@ void fade(uint32_t c1, uint32_t c2, double steps, int wait)
   }
 }
 
-//BE - warm color palette
+//BE - earth color palette
+void airRand(int loops)
+{
+  uint32_t colors[] = {shipcove,white,deepblue,poloblue};
+  int colorCount = 4;
+  int maxWait = 150;
+  paletteRand(colors,colorCount,maxWait,loops);
+}
+
+//BE - earth color palette
+void earthRand(int loops)
+{
+  uint32_t colors[] = {darkolivegreen,darkslategray,forestgreen,darkgreen};
+  int colorCount = 4;
+  int maxWait = 150;
+  paletteRand(colors,colorCount,maxWait,loops);
+}
+
+//BE - fire color palette
 void fireRand(int loops)
 {
   uint32_t colors[] = {black,red,orangered,yellow};
@@ -509,7 +543,7 @@ void fireRand(int loops)
   paletteRand(colors,colorCount,maxWait,loops);
 }
 
-//BE - cool color palette
+//BE - water color palette
 void waterRand(int loops)
 {
   uint32_t colors[] = {black,blue,seagreen};
@@ -596,12 +630,101 @@ void spiral(uint32_t bc, uint32_t fc, uint8_t wait, boolean reverse, int enddela
   colorByNumber(pixels, pixelCount, bc, fc, wait, reverse, enddelay, clears);
 }
 
-//BE - nice animated spiral
-void the_hoff(uint32_t bc, uint32_t fc, uint8_t wait, boolean reverse, int enddelay )
+//BE - knight rider 
+void the_hoff(uint32_t bc, uint32_t fc, uint8_t wait )
 {
-  int pixels[] = {4,6,12,18,20,18,12,6,4,6,12,18,20,18,12,6};
-  int pixelCount = 16;
-  colorByNumber(pixels, pixelCount, bc, fc, wait, reverse, enddelay, true);
+  int pixels[] = {4,6,12,18,20,18,12,6};
+  for(int i=0;i<20;i++)
+    colorByNumber(pixels, sizeof(pixels)/sizeof(int), bc, fc, wait, true, 0, true);
+}
+
+//BE - cylon
+void cylon(uint8_t wait )
+{
+  for(int i=0;i<10;i++){
+      
+    uint32_t r1 = Color(255,0,0);
+    uint32_t r2 = Color(200,0,0);
+    uint32_t r3 = Color(10,0,0);
+    uint32_t r4 = Color(5,0,0);
+    uint32_t r5 = Color(1,0,0);
+    int f1[]  = {4};
+    int f2[]  = {3,5};
+    int f3a[] = {6};  
+    int f3b[] = {2,14};  
+    int f4a[] = {7,13};
+    int f4b[] = {1,15};
+    int f5a[] = {12};
+    int f5b[] = {8,16};
+    int f5c[] = {0,24};
+    int f6a[] = {11,17};
+    int f6b[] = {9,23};
+    int f7a[] = {18};
+    int f7b[] = {10,22};
+    int f8[]  = {19,21};
+    int f9[]  = {20};
+    
+    ringSet(black);
+    setPixelGroup(f1, 1, r1);
+    delay(wait);
+    ringSet(black);
+    setPixelGroup(f2, 2, r2);
+    delay(wait);  
+    ringSet(black);
+    setPixelGroup(f3a, 1, r1);
+    setPixelGroup(f3b, 2, r2);
+    delay(wait);   
+    ringSet(black);
+    setPixelGroup(f4a, 2, r2);
+    setPixelGroup(f4b, 2, r4);
+    delay(wait);     
+    ringSet(black);
+    setPixelGroup(f5a, 1, r1);
+    setPixelGroup(f5b, 2, r3);
+    setPixelGroup(f5c, 2, r5);
+    delay(wait);       
+    ringSet(black);
+    setPixelGroup(f6a, 2, r2);
+    setPixelGroup(f6b, 2, r4);
+    delay(wait);       
+    ringSet(black);
+    setPixelGroup(f7a, 1, r1);
+    setPixelGroup(f7b, 2, r2);
+    delay(wait);         
+    ringSet(black);
+    setPixelGroup(f8, 2, r2);
+    delay(wait);
+    ringSet(black);
+    setPixelGroup(f9, 1, r1);
+    delay(wait);  
+    ringSet(black);
+    setPixelGroup(f8, 2, r2);
+    delay(wait);  
+    ringSet(black);
+    setPixelGroup(f7a, 1, r1);
+    setPixelGroup(f7b, 2, r2);
+    delay(wait);           
+    ringSet(black);
+    setPixelGroup(f6a, 2, r2);
+    setPixelGroup(f6b, 2, r4);
+    delay(wait);  
+    ringSet(black);
+    setPixelGroup(f5a, 1, r1);
+    setPixelGroup(f5b, 2, r3);
+    setPixelGroup(f5c, 2, r5);
+    delay(wait);      
+    ringSet(black);
+    setPixelGroup(f4a, 2, r2);
+    setPixelGroup(f4b, 2, r4);
+    delay(wait); 
+    ringSet(black);    
+    setPixelGroup(f3a, 1, r1);
+    setPixelGroup(f3b, 2, r2);
+    delay(wait);     
+    ringSet(black);
+    setPixelGroup(f2, 2, r2);
+    delay(wait);  
+  }
 }
 
 //BE - take a pleasant stroll
@@ -624,32 +747,29 @@ void bulls(uint32_t c1, uint32_t c2, uint32_t c3, uint8_t wait, int loops)
   int smallRing[] = {12};
   int medRing[] = {6,7,8,11,13,18,17,16};
   int bigRing[] = {0,1,2,3,4,5,14,15,24,23,22,21,20,19,10,9};
-  int smallCount = 1;
-  int medCount = 8;
-  int bigCount = 16;
 
   for(int i=0;i<loops+1;i++)
   {
-    setPixelGroup(smallRing, smallCount, c1);
+    setPixelGroup(smallRing, 1, c1);
     delay(wait);
-    setPixelGroup(medRing, medCount, c1);
-    setPixelGroup(smallRing, smallCount, c2);
+    setPixelGroup(medRing, 8, c1);
+    setPixelGroup(smallRing, 1, c2);
     delay(wait);
-    setPixelGroup(bigRing, bigCount, c1);
-    setPixelGroup(medRing, medCount, c2);
-    setPixelGroup(smallRing, smallCount, c3);
+    setPixelGroup(bigRing, 16, c1);
+    setPixelGroup(medRing, 8, c2);
+    setPixelGroup(smallRing, 1, c3);
     delay(wait);
-    setPixelGroup(bigRing, bigCount, c2);
-    setPixelGroup(medRing, medCount, c3);
-    setPixelGroup(smallRing, smallCount, c1);
+    setPixelGroup(bigRing, 16, c2);
+    setPixelGroup(medRing, 8, c3);
+    setPixelGroup(smallRing, 1, c1);
     delay(wait);  
-    setPixelGroup(bigRing, bigCount, c3);
-    setPixelGroup(medRing, medCount, c1);
-    setPixelGroup(smallRing, smallCount, c2);
+    setPixelGroup(bigRing, 16, c3);
+    setPixelGroup(medRing, 8, c1);
+    setPixelGroup(smallRing, 1, c2);
     delay(wait);  
-    setPixelGroup(bigRing, bigCount, c1);
-    setPixelGroup(medRing, medCount, c2);
-    setPixelGroup(smallRing, smallCount, c3);
+    setPixelGroup(bigRing, 16, c1);
+    setPixelGroup(medRing, 8, c2);
+    setPixelGroup(smallRing, 1, c3);
     delay(wait);  
   }
 }
@@ -897,9 +1017,14 @@ void colorByNumber(int pixels[],int pixelCount, uint32_t bc, uint32_t fc, uint8_
 void setPixelGroup(int pixels[],int pixelCount, uint32_t c)
 {
   int i;
+  uint32_t color = c;
   for(i=0;i<pixelCount;i++)
   {
-    strip.setPixelColor(pixels[i],c);
+    if(c == dybim)
+    {
+      color = i * ( 255/pixelCount);
+    }
+    strip.setPixelColor(pixels[i],color);
   }
   strip.show();
 }
