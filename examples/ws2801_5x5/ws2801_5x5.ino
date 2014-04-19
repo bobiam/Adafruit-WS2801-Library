@@ -70,10 +70,10 @@ uint32_t seagreen = Color(84,255,159);
 uint32_t indigo = Color(75,0,130);
 uint32_t violet = Color(238,130,238);
 uint32_t white = Color(255,255,255);
-uint32_t darkgreen = Color(0,100,0);
-uint32_t forestgreen = Color(34,139,34);
-uint32_t darkslategray = Color(47,79,79);
-uint32_t darkolivegreen = Color(85,107,47);
+uint32_t darkgreen = Color(0,255,0);
+uint32_t forestgreen = Color(34,255,34);
+uint32_t darkslategray = Color(47,255,79);
+uint32_t darkolivegreen = Color(85,255,47);
 uint32_t shipcove = Color(115,138,189);
 uint32_t poloblue = Color(118,149,200);
 uint32_t deepblue = Color(0,11,76);
@@ -140,26 +140,15 @@ void setup() {
 
 
 void loop() {
-  hello(black,green,500);  
+  elementalRun();  
+  hello(black,white,500);  
   cylon(100);  
   smiley(black, yellow, 250, false, 1000);  
   meh(black, green, 250, false, 1000);  
   frowny(black, blue, 250, false, 1000);   
-  the_hoff(black ,red, 150);    
-  airRand(100);
-  earthRand(100);
-  fireRand(100);
-  waterRand(100);
-  airRand(50);
-  earthRand(50);
-  fireRand(50);
-  waterRand(50); 
-  airRand(10);  
-  earthRand(10);
-  fireRand(10);
-  waterRand(10);  
   primaryBars();  
   alphabet(named_colors[random(0,named_colors_count)],named_colors[random(0,named_colors_count)],500);
+
   the_hoff(black ,red, 150);  
   spiral(black ,dybim, 50, false, 0, true);  
   cgol(black,green,500,60,cgol_infinite2, true, false);
@@ -516,6 +505,22 @@ void fade(uint32_t c1, uint32_t c2, double steps, int wait)
   }
 }
 
+void elementalRun()
+{
+  airRand(100);
+  earthRand(100);
+  fireRand(100);
+  waterRand(100);
+  airRand(50);
+  earthRand(50);
+  fireRand(50);
+  waterRand(50); 
+  airRand(10);  
+  earthRand(10);
+  fireRand(10);
+  waterRand(10);  
+}
+
 //BE - earth color palette
 void airRand(int loops)
 {
@@ -528,7 +533,7 @@ void airRand(int loops)
 //BE - earth color palette
 void earthRand(int loops)
 {
-  uint32_t colors[] = {darkolivegreen,darkslategray,forestgreen,darkgreen};
+  uint32_t colors[] = {darkolivegreen,darkslategray,green,black};
   int colorCount = 4;
   int maxWait = 150;
   paletteRand(colors,colorCount,maxWait,loops);
@@ -911,7 +916,7 @@ void paletteRand(uint32_t colors[], int colorCount,int maxWait, int loops)
   {
     for(int i =0; i < strip.numPixels();i++)
     {
-      strip.setPixelColor(i,colors[random(0,colorCount-1)]);
+      strip.setPixelColor(i,colors[random(0,colorCount)]);
     }
     strip.show();
     delay(random(0,maxWait));
