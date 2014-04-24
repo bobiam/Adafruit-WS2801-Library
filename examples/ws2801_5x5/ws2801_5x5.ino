@@ -140,6 +140,7 @@ void setup() {
 
 
 void loop() {
+  tony();
   hello(white,red,500);  
   cgol(blue,green,500,60,cgol_emptyPixels, false, true);
   cgol(red,blue,500,60,cgol_emptyPixels, false, false);
@@ -169,6 +170,7 @@ void loop() {
   spinner(red,blue,90,20,true);
   spinner(red,blue,90,20,false);  
   flashlight(2000);    
+  githubAvatar();
   cgol(black,randomColor(),100,60,cgol_glider, true, false);
   fade(red,orange,100,100);
   fade(orange,yellow,100,100);
@@ -200,38 +202,58 @@ void loop() {
   bang(black, red, 250, false, 1000);  
 }
 
-//BE - tony
+//BE - githubAvatar()
+void githubAvatar(){
+  byte pixels[] = {4,5,14,15,24,6,16,2,12,22,1,8,18,21,10};
+  ringSet(Color(0,0,0));
+  setPixelGroup(pixels, sizeof(pixels), Color(65,131,196));
+  delay(3000);
+}
 
+//BE - tony
 void tony()
 {
   // :)
-  int smallRing[] = {12};
-  int medRing[] = {6,7,8,11,13,18,17,16};
-  int bigRing[] = {0,1,2,3,4,5,14,15,24,23,22,21,20,19,10,9};
+  byte smallRing[] = {12};
+  //byte medRing[] = {8,11,18,17,16,13,6,7};
+  byte medRing[] = {7,6,13,16,17,18,11,8};
+  byte bigRing[] = {0,1,2,3,4,5,14,15,24,23,22,21,20,19,10,9};
   
-  int i, level;
+  long i;
+  long level;
   
   strip.setPixelColor(smallRing[0],white);
-  for(i=0;i<sizeof(medRing)/sizeof(int);i++)
+  for(i=0;i<sizeof(medRing);i++)
   {
-    strip.setPixelColor(medRing[i],Color(200,200,200));
+    strip.setPixelColor(medRing[i],Color(150,150,150));
   }
-  for(i=0;i<sizeof(bigRing)/sizeof(int);i++)
+  for(i=0;i<sizeof(bigRing);i++)
   {
     strip.setPixelColor(bigRing[i],Color(200,200,200));
   }
   strip.show();
-  for(int j=0;j<255;j++)
+  for(byte j=0;j<255;j++)
   {
-    for(i=0;i<sizeof(bigRing)/sizeof(int);i++)
+    for(i=0;i<16;i++)
     {
-      level = ((j+i)*5)%255;
+      level = i+j;
+      level = level % 16;
+      level = level * 17;
       strip.setPixelColor(bigRing[i],Color(level,level,level));
+      strip.show();      
     }
+    for(i=0;i<8;i++)
+    {
+      level = i+j;
+      level = level % 8;
+      level = level * 36;
+      strip.setPixelColor(medRing[i],Color(level,level,level));
+      strip.show();      
+    }
+    
     strip.show();
-    delay(30);
   }
-  
+
 }
 
 //BE - progressiveants
