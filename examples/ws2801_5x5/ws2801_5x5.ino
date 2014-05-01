@@ -1,6 +1,7 @@
 #include "SPI.h"
 #include "Adafruit_WS2801.h"
-//#include <MemoryFree.h>
+#include <MemoryFree.h>
+#define HWSERIAL Serial1
 
 /*
   ws2808play - a collection of patterns written for a 5x5 square, by Bob Eells (!Bob) for a display I built for Flipside 2014.
@@ -15,6 +16,9 @@
   
   With 24 at the top of the diamond.  The whole thing is currently driven by a teensy 2.0 and is a wearable piece powered by the two usb ports on a 10,000mAh rechargable battery.   
   Runtime on a full charge is about 10 hours, depending on patterns chosen.  Be sure that your power supply can provide a couple amps.
+  
+  Strand is controlled via a bluetooth serial connection on Serial1 - a very simplistic protocol chooses the patterns via bluetooth console. 
+  If I don't get distracted by another project, I may come back and add a more complex control interface for this, but for now, it's command line. ;)
   
   Modified heavily from the original Adafruit WS2801 example.
   
@@ -54,9 +58,6 @@ Example sketch for driving Adafruit WS2801 pixels!
 uint8_t dataPin  = 2;    // Yellow wire on Adafruit Pixels
 uint8_t clockPin = 3;    // Green wire on Adafruit Pixels
 
-// Don't forget to connect the ground wire to Arduino ground,
-// and the +5V wire to a +5V supply
-
 // Set the first variable to the NUMBER of pixels. 25 = 25 pixels in a row
 Adafruit_WS2801 strip = Adafruit_WS2801(25, dataPin, clockPin);
 
@@ -86,69 +87,246 @@ uint32_t dybim = white+1;
 byte cgol_emptyPixels[] = {};
 byte cgol_glider[] = {0,0,1,0,0, 1,0,1,0,0, 0,0,1,1,0, 0,0,0,0,0, 0,0,0,0,0};
 
-//letters 
-byte l_a[] = {0,1,2,3,4,5,7,14,12,15,17,24,23,22,21,20};
-byte l_b[] = {0,1,2,3,4,5,7,9,14,12,10,15,17,19,24,23,21,20};
-byte l_c[] = {24,15,14,5,4,3,2,1,0,9,10,19,20};
-byte l_d[] = {0,1,2,3,4,9,5,10,14,19,15,21,22,23};
-byte l_e[] = {0,1,2,3,4,5,14,15,24,7,12,9,10,19,20};
-byte l_f[] = {0,1,2,3,4,5,14,15,24,7,12};
-byte l_g[] = {24,15,14,5,4,3,2,1,0,9,10,19,20,21,22,17,12};
-byte l_h[] = {0,1,2,3,4,7,12,17,24,23,22,21,20};
-byte l_i[] = {14,13,12,11,10};
-byte l_j[] = {1,0,9,10,19,20,21,22,23,24};
-byte l_k[] = {0,1,2,3,4,7,13,11,15,19};
-byte l_l[] = {0,1,2,3,4,9,10,19,20};
-byte l_m[] = {0,1,2,3,4,6,12,16,24,23,22,21,20};
-byte l_n[] = {0,1,2,3,4,6,12,18,24,23,22,21,20};
-byte l_o[] = {0,1,2,3,4,5,14,15,24,23,22,21,20,19,10,9};
-byte l_p[] = {0,1,2,3,4,5,7,14,12,15,17,24,23,22};
-byte l_q[] = {0,1,2,3,4,5,14,15,24,23,22,21,20,19,10,9,18};
-byte l_r[] = {0,1,2,3,4,5,14,15,24,7,12,23,17,18,20};
-byte l_s[] = {24,15,14,5,4,3,2,7,12,17,22,21,20,19,10,9,0};
-byte l_t[] = {4,5,14,15,24,13,12,11,10};
-byte l_u[] = {4,3,2,1,0,9,10,19,20,21,22,23,24};
-byte l_v[] = {4,3,2,8,10,18,22,23,24};
-byte l_w[] = {4,3,2,1,9,11,12,13,14,19,21,22,23,24};
-byte l_x[] = {4,6,12,18,20,24,16,8,0};
-byte l_y[] = {4,6,12,11,10,16,24};
-byte l_z[] = {4,5,14,15,24,16,12,8,0,9,10,19,20};
-
-// Optional: leave off pin numbers to use hardware SPI
-// (pinout is then specific to each board and can't be changed)
-//Adafruit_WS2801 strip = Adafruit_WS2801(25);
-
-// For 36mm LED pixels: these pixels internally represent color in a
-// different format.  Either of the above constructors can accept an
-// optional extra parameter: WS2801_RGB is 'conventional' RGB order
-// WS2801_GRB is the GRB order required by the 36mm pixels.  Other
-// than this parameter, your code does not need to do anything different;
-// the library will handle the format change.  Examples:
-//Adafruit_WS2801 strip = Adafruit_WS2801(25, dataPin, clockPin, WS2801_GRB);
-//Adafruit_WS2801 strip = Adafruit_WS2801(25, WS2801_GRB);
+char serial_val; // variable to receive data from the serial port
+boolean first_run = true; // I want to display a message on connect.
+boolean new_serial_val = true; // For code that only runs once at the start of a program.
 
 void setup() {
-  //Nice to have for memory checking.
-  //Serial.print("freeMemory()=");
-  //Serial.println(freeMemory());  
-
   Serial.begin(115200); // Open serial monitor at 115200 baud to see debugs    
+  HWSERIAL.begin(9600);
   strip.begin();
+  //Nice to have for memory checking.
+  /*
+  Serial.print("freeMemory()=");
+  Serial.println(freeMemory());  
+  HWSERIAL.print("freeMemory()=");  
+  HWSERIAL.println(freeMemory());
+  */
   // Update LED contents, to start they are all 'off'
   strip.show();
 }
 
 
 void loop() {
-  tony();
+
+  if(first_run)
+  {
+    ringSet(black);     
+  }    
+
+  if( HWSERIAL.available() )       // if data is available to read
+  {
+    if(first_run)
+    {
+      first_run = false;                             // but just this once
+    }    
+    serial_val = HWSERIAL.read();         // read data and store it in 'serial_val'
+    new_serial_val = true;              // we have a new one
+  }
+  if( serial_val == 'l')
+  {
+    serial_val = HWSERIAL.read();
+    if(serial_val == 's')
+    {
+      if(new_serial_val)
+      {
+        HWSERIAL.println("Greetings Professor Falken, would you like to play a game?");  // say hi
+        HWSERIAL.print("My available memory is: ");        
+        HWSERIAL.println(freeMemory());          
+        HWSERIAL.println("/-=~^=-^=-~`='`-~===~----~===~-`'=`~-=^-=^~=-\\");
+        HWSERIAL.println("|                      b = bang()            |");
+        HWSERIAL.println("| c = cylon()          d = progressiveAnts() |");
+        HWSERIAL.println("| e = elementalRun()   f = flashlight()      |");        
+        HWSERIAL.println("| g = cgol()           h = thehoff()         |");                
+        HWSERIAL.println("| i = infinity()                             |");
+        HWSERIAL.println("| m = meander()                              |");        
+        HWSERIAL.println("| o = off              p = unicornPoo()      |");                
+        HWSERIAL.println("| s = unicornSpit()    t = tony()            |");        
+        HWSERIAL.println("| u = unattended()     v = spiral()          |");                
+        HWSERIAL.println("/-=~^=-^=-~`='`-~===~----~===~-`'=`~-=^-=^~=-\\");
+        serial_val = 'o';
+      }
+      new_serial_val = false;
+    }
+  }
+  
+  switch(serial_val)
+  {
+    /*
+    case 'a':
+      if(new_serial_val == true)
+      {
+        HWSERIAL.println("I'm starting alphabet()");
+        new_serial_val = false;
+      }
+      alphabet(black, randomColor(), random(0,500));
+      break;
+*/
+    case 'b':
+      if(new_serial_val == true)
+      {
+        HWSERIAL.println("I'm starting bang()");
+        new_serial_val = false;
+      }
+      bang(black,randomColor(),10,true,50);
+      break;
+      
+    case 'c':
+      if(new_serial_val == true)
+      {
+        HWSERIAL.println("I'm starting cylon()");
+        new_serial_val = false;
+      }
+      cylon(100); 
+      break;
+      
+    case 'd':
+      if(new_serial_val == true)
+      {
+        HWSERIAL.println("I'm starting progressiveAnts()");
+        new_serial_val = false;
+      }
+      progressiveAnts(randomColor(),randomColor(),500); 
+      break;
+
+    case 'e':
+      if(new_serial_val == true)
+      {
+        HWSERIAL.println("I'm starting elementalRun()");
+        new_serial_val = false;
+      }
+      elementalRun();
+      break;
+    
+    case 'g':
+      if(new_serial_val == true)
+      {
+        HWSERIAL.println("I'm starting cgol()");
+        new_serial_val = false;
+      }
+      cgol(black,randomColor(),500,60,cgol_emptyPixels, false, false);
+      break;
+    
+    case 'f':
+      if(new_serial_val == true)
+      {
+        HWSERIAL.println("I'm starting flashlight()");
+        new_serial_val = false;
+      }
+      flashlight(100);
+      break;
+    
+    case 'h':
+      if(new_serial_val == true)
+      {
+        HWSERIAL.println("I'm starting thehoff()");
+        new_serial_val = false;
+      }
+      the_hoff(black ,red, 150);
+      break;
+      
+    case 'i':
+      if(new_serial_val == true)
+      {
+        HWSERIAL.println("I'm starting infinity()");
+        new_serial_val = false;
+      }
+      infinity();
+      break;
+    
+    case 'm':
+      if(new_serial_val == true)        
+      {
+        HWSERIAL.println("I'm meandering");
+        new_serial_val = false;
+      }
+      meander(black,dybim,50,true,0,true);  
+      meander(black,dybim,50,false,0,true);  
+      break;
+      
+    case 'o':
+      if(new_serial_val == true)        
+      {
+        HWSERIAL.println("The system is going offline NOW!");
+        new_serial_val = false;
+      }
+      ringSet(black);
+      break;
+  
+    case 'p':
+      if(new_serial_val == true)        
+      {
+        HWSERIAL.println("The unicorn is pooping now");
+        new_serial_val = false;
+      }
+      unicornPoo(50,500);
+      break;
+  
+    case 's':
+      if(new_serial_val == true)        
+      {
+        HWSERIAL.println("I'm starting unicornSpit()");
+        new_serial_val = false;
+      }
+      unicornSpit(50,50);
+      break;
+      
+    case 't':
+      if(new_serial_val == true)        
+      {
+        HWSERIAL.println("I'm starting tony()");
+        new_serial_val = false;
+      }
+      tony();
+      break;
+    
+    case 'u':
+      if(new_serial_val == true)
+      {
+        HWSERIAL.println("I'm starting unattended()");
+        new_serial_val = false;
+      }
+      unattended();
+      break;
+    
+    case 'v':
+      if(new_serial_val == true)
+      {
+        HWSERIAL.println("I'm vortexing a spiral()");
+        new_serial_val = false;
+      }
+      uint32_t rc = randomColor();
+      if(random(0,10)>8)
+        rc = dybim;
+      spiral(black , rc, 50, false, 0, false);  
+      spiral(rc , black, 50, true, 0, false);  
+      break;
+  }
+  
+
+}
+
+void unattended(){
+  unicornPoo(50,500);
+  unicornSpit(50,50);  
+  meander(black,dybim,50,true,0,false);
+  meander(black,dybim,50,true,0,true);  
+  meander(black,dybim,50,false,0,true);  
+  meander(black,dybim,50,true,0,true);  
+  meander(black,dybim,50,false,0,true);    
+  spiral(black ,dybim, 50, false, 0, true);  
+  spiral(black ,dybim, 50, true, 0, true);      
+  count_em();
   hello(white,red,500);  
   cgol(blue,green,500,60,cgol_emptyPixels, false, true);
   cgol(red,blue,500,60,cgol_emptyPixels, false, false);
   cgol(orange,black,500,60,cgol_emptyPixels, false, false);
   cgol(blue,yellow,500,60,cgol_emptyPixels, false, false);  
+  tony();  
+  infinity();
   elementalRun();    
   unicornPoo(50,500);
-  unicornPuke(50,50);
+  unicornSpit(50,50);
   cylon(100);    
   progressiveAnts(red,blue,500);  
   primaryBars();  
@@ -166,7 +344,7 @@ void loop() {
   spiral(green ,dybim, 50, true, 0, false);  
   spiral(blue ,dybim, 50, false, 0, true);  
   the_hoff(black ,red, 150);  
-  alphabet(black, orangered, 200);
+//  alphabet(black, orangered, 200);
   spinner(red,blue,90,20,true);
   spinner(red,blue,90,20,false);  
   flashlight(2000);    
@@ -202,6 +380,56 @@ void loop() {
   bang(black, red, 250, false, 1000);  
 }
 
+//BE - a chasing infinity symbol
+int infinity()
+{
+  byte d_10[] = {4,5,14,13,12,11,10,19,20,21,22,17,7,2,3};  
+  //ringSet(black);
+  for(byte i=0;i<255;i++)
+  {
+    colorByNumber(d_10,sizeof(d_10), white+51, dybim, 0, false, 0, false);
+    array_spin(d_10,sizeof(d_10));
+    if( HWSERIAL.available() )
+      return 111;    
+  }
+}
+
+//BE - testing the digits
+void count_em()
+{
+  byte d_0[] = {23,22,18,10,9,1,2,6,14,15};
+  byte d_1[] = {24,16,12,8,0};
+  byte d_2[] = {14,15,24,23,22,17,12,7,2,8,10};
+  byte d_3[] = {14,15,24,23,22,17,12,11,10,9,0,1,2};
+  byte d_4[] = {24,16,12,8,0,15,14,5,4,6,12,18};
+  byte d_5[] = {22,16,14,6,12,11,10,9,0,1};
+  byte d_6[] = {23,24,15,14,6,2,1,0,9,10,11,12,7};
+  byte d_7[] = {14,16,22,21,18,11,8,1};
+  byte d_8[] = {24,15,14,13,12,11,10,9,0,1,2,7,12,17,22,23};
+  byte d_9[] = {23,24,15,14,13,12,17,11,9};  
+  int wait = 1000;
+  colorByNumber(d_0,sizeof(d_0), black, dybim, 50, false, 1000, false);
+  delay(wait);    
+  colorByNumber(d_1,sizeof(d_1), black, dybim, 50, false, 1000, false);
+  delay(wait);    
+  colorByNumber(d_2,sizeof(d_2), black, dybim, 50, false, 1000, false);
+  delay(wait);    
+  colorByNumber(d_3,sizeof(d_3), black, dybim, 50, false, 1000, false);
+  delay(wait);    
+  colorByNumber(d_4,sizeof(d_4), black, dybim, 50, false, 1000, false);
+  delay(wait);    
+  colorByNumber(d_5,sizeof(d_5), black, dybim, 50, false, 1000, false);
+  delay(wait);    
+  colorByNumber(d_6,sizeof(d_6), black, dybim, 50, false, 1000, false);
+  delay(wait);    
+  colorByNumber(d_7,sizeof(d_7), black, dybim, 50, false, 1000, false);
+  delay(wait);    
+  colorByNumber(d_8,sizeof(d_8), black, dybim, 50, false, 1000, false);
+  delay(wait);    
+  colorByNumber(d_9,sizeof(d_9), black, dybim, 50, false, 1000, false);
+  delay(wait);    
+}
+
 //BE - githubAvatar()
 void githubAvatar(){
   byte pixels[] = {4,5,14,15,24,6,16,2,12,22,1,8,18,21,10};
@@ -211,7 +439,7 @@ void githubAvatar(){
 }
 
 //BE - tony
-void tony()
+int tony()
 {
   // :)
   byte smallRing[] = {12};
@@ -241,35 +469,36 @@ void tony()
       level = level * 17;
       strip.setPixelColor(bigRing[i],Color(level,level,level));
       strip.show();      
+      if( HWSERIAL.available() )
+        return 111;        
     }
-    for(i=0;i<8;i++)
-    {
-      level = i+j;
-      level = level % 8;
-      level = level * 36;
-      strip.setPixelColor(medRing[i],Color(level,level,level));
-      strip.show();      
-    }
-    
     strip.show();
   }
 
 }
 
 //BE - progressiveants
-void progressiveAnts(uint32_t bgc, uint32_t fgc, uint32_t initial_wait)
+int progressiveAnts(uint32_t bgc, uint32_t fgc, uint32_t initial_wait)
 {
   int w = initial_wait;
   while(w > 0)
   {
     ants(bgc,fgc,w);
     w = w-(initial_wait * .05); 
+    if( HWSERIAL.available() )
+      return 111;      
   }
 }
 
 //BE - hello
 void hello(uint32_t bgc, uint32_t fgc, int wait)
 {
+  //letters 
+  byte l_e[] = {0,1,2,3,4,5,14,15,24,7,12,9,10,19,20};
+  byte l_h[] = {0,1,2,3,4,7,12,17,24,23,22,21,20};
+  byte l_l[] = {0,1,2,3,4,9,10,19,20};
+  byte l_o[] = {0,1,2,3,4,5,14,15,24,23,22,21,20,19,10,9};
+
   ringSet(bgc);
   setPixelGroup(l_h, sizeof(l_h)/sizeof(byte), fgc);
   delay(wait);
@@ -288,9 +517,36 @@ void hello(uint32_t bgc, uint32_t fgc, int wait)
 }
 
 //BE - text 
-
+/*
 void alphabet(uint32_t bgc, uint32_t fgc, int wait)
 {
+  //letters 
+  byte l_a[] = {0,1,2,3,4,5,7,14,12,15,17,24,23,22,21,20};
+  byte l_b[] = {0,1,2,3,4,5,7,9,14,12,10,15,17,19,24,23,21,20};
+  byte l_c[] = {24,15,14,5,4,3,2,1,0,9,10,19,20};
+  byte l_d[] = {0,1,2,3,4,9,5,10,14,19,15,21,22,23};
+  byte l_e[] = {0,1,2,3,4,5,14,15,24,7,12,9,10,19,20};
+  byte l_f[] = {0,1,2,3,4,5,14,15,24,7,12};
+  byte l_g[] = {24,15,14,5,4,3,2,1,0,9,10,19,20,21,22,17,12};
+  byte l_h[] = {0,1,2,3,4,7,12,17,24,23,22,21,20};
+  byte l_i[] = {14,13,12,11,10};
+  byte l_j[] = {1,0,9,10,19,20,21,22,23,24};
+  byte l_k[] = {0,1,2,3,4,7,13,11,15,19};
+  byte l_l[] = {0,1,2,3,4,9,10,19,20};
+  byte l_m[] = {0,1,2,3,4,6,12,16,24,23,22,21,20};
+  byte l_n[] = {0,1,2,3,4,6,12,18,24,23,22,21,20};
+  byte l_o[] = {0,1,2,3,4,5,14,15,24,23,22,21,20,19,10,9};
+  byte l_p[] = {0,1,2,3,4,5,7,14,12,15,17,24,23,22};
+  byte l_q[] = {0,1,2,3,4,5,14,15,24,23,22,21,20,19,10,9,18};
+  byte l_r[] = {0,1,2,3,4,5,14,15,24,7,12,23,17,18,20};
+  byte l_s[] = {24,15,14,5,4,3,2,7,12,17,22,21,20,19,10,9,0};
+  byte l_t[] = {4,5,14,15,24,13,12,11,10};
+  byte l_u[] = {4,3,2,1,0,9,10,19,20,21,22,23,24};
+  byte l_v[] = {4,3,2,8,10,18,22,23,24};
+  byte l_w[] = {4,3,2,1,9,11,12,13,14,19,21,22,23,24};
+  byte l_x[] = {4,6,12,18,20,24,16,8,0};
+  byte l_y[] = {4,6,12,11,10,16,24};
+  byte l_z[] = {4,5,14,15,24,16,12,8,0,9,10,19,20};  
   ringSet(bgc);
   setPixelGroup(l_a, sizeof(l_a)/sizeof(byte), fgc);
   delay(wait);
@@ -369,10 +625,10 @@ void alphabet(uint32_t bgc, uint32_t fgc, int wait)
   ringSet(bgc);
   setPixelGroup(l_z, sizeof(l_z)/sizeof(byte), fgc);
   delay(wait);      
-}
+}*/
 
 //BE - Conway's Game of Life
-void cgol(uint32_t bgc, uint32_t fgc, int wait, int maxGenerations, byte pixels[], boolean usePixels, boolean emote)
+int cgol(uint32_t bgc, uint32_t fgc, int wait, int maxGenerations, byte pixels[], boolean usePixels, boolean emote)
 {
   randomSeed(analogRead(7));
   int generations = 0;
@@ -421,6 +677,8 @@ void cgol(uint32_t bgc, uint32_t fgc, int wait, int maxGenerations, byte pixels[
   while(alive)
   {
     generations++;
+    if( HWSERIAL.available() )
+      return 111;      
     
     for(int i=0;i<strip.numPixels();i++)
     {
@@ -495,7 +753,7 @@ void cgol(uint32_t bgc, uint32_t fgc, int wait, int maxGenerations, byte pixels[
 }
 
 //BE - fade entire strand from *c1* to *c2* in *steps* increments with *wait* delay.
-void fade(uint32_t c1, uint32_t c2, double steps, int wait)
+int fade(uint32_t c1, uint32_t c2, double steps, int wait)
 {
   //get the rgb values for each color
   byte ret[3];
@@ -544,36 +802,32 @@ void fade(uint32_t c1, uint32_t c2, double steps, int wait)
     tmpC_r += delta_r;
     tmpC_g += delta_g;
     tmpC_b += delta_b;
-    Serial.print("Step ");
-    Serial.print(i);
-    Serial.print(" of: ");
-    Serial.println(steps);
-    Serial.print("r:");
-    Serial.print(tmpC_r);
-    Serial.print("g:");
-    Serial.print(tmpC_g);
-    Serial.print("b:");
-    Serial.println(tmpC_b);
     ringSet(Color(tmpC_r,tmpC_g,tmpC_b));
     delay(wait);
-    
+    if( HWSERIAL.available() )
+      return 111;      
   }
 }
 
-void elementalRun()
+int elementalRun()
 {
-  airRand(100);
-  earthRand(100);
-  fireRand(100);
-  waterRand(100);
-  airRand(50);
-  earthRand(50);
-  fireRand(50);
-  waterRand(50); 
-  airRand(10);  
-  earthRand(10);
-  fireRand(10);
-  waterRand(10);  
+  int i = 100;
+  while(i>5)
+  {
+    airRand(i);
+    if( HWSERIAL.available() )
+      return 111;    
+    earthRand(i);
+    if( HWSERIAL.available() )
+      return 111;        
+    fireRand(i);
+    if( HWSERIAL.available() )
+      return 111;        
+    waterRand(i);
+    if( HWSERIAL.available() )
+      return 111;    
+    i = i / 2;      
+  }  
 }
 
 //BE - earth color palette
@@ -615,7 +869,7 @@ void flashlight(int wait)
   delay(wait);
 }
 
-void unicornPuke(int wait, int loops)
+int unicornSpit(int wait, int loops)
 {
   ringSet(Color(0,0,0));
   byte smallRing[] = {12};
@@ -630,10 +884,12 @@ void unicornPuke(int wait, int loops)
     setPixelGroup(medRing,   8,   colors[(i+1)%(sizeof(colors)/sizeof(uint32_t))]);
     setPixelGroup(bigRing,   16,  colors[(i+0)%(sizeof(colors)/sizeof(uint32_t))]);
     delay(wait);  
+    if( HWSERIAL.available() )
+      return 111;            
   }  
 }
 
-void unicornPoo(int wait, int loops)
+int unicornPoo(int wait, int loops)
 {
   ringSet(Color(0,0,0));
   byte smallRing[] = {12};
@@ -645,12 +901,14 @@ void unicornPoo(int wait, int loops)
     setPixelGroup(smallRing, 1,   Wheel((i*10)%255));
     setPixelGroup(medRing,   8,   Wheel(((i+10)*10)%255));
     setPixelGroup(bigRing,   16,  Wheel(((i+20)*10)%255));
-    delay(wait);  
+    delay(wait); 
+    if( HWSERIAL.available() )
+      return 111;            
   }  
 }
 
 //BE - this was called OMGP in L2C.  (Oh My GOD, PONIES!)
-void primaryBars()
+int primaryBars()
 {
   int rows = 5;
   int cols = 5;
@@ -668,6 +926,8 @@ void primaryBars()
         pixel++;      
       }
       strip.show();
+      if( HWSERIAL.available() )
+        return 111;              
     }
     delay(100);
     uint32_t temp = colors[0];
@@ -713,39 +973,42 @@ void spiral(uint32_t bc, uint32_t fc, uint8_t wait, boolean reverse, int enddela
 }
 
 //BE - knight rider 
-void the_hoff(uint32_t bc, uint32_t fc, uint8_t wait )
+int the_hoff(uint32_t bc, uint32_t fc, uint8_t wait )
 {
   byte pixels[] = {4,6,12,18,20,18,12,6};
   for(byte i=0;i<20;i++)
+  {
     colorByNumber(pixels, sizeof(pixels), bc, fc, wait, true, 0, true);
+    if( HWSERIAL.available() )
+      return 111;            
+  }
 }
 
 //BE - cylon
-void cylon(uint8_t wait )
+int cylon(uint8_t wait )
 {
+  uint32_t r1 = Color(255,0,0);
+  uint32_t r2 = Color(200,0,0);
+  uint32_t r3 = Color(10,0,0);
+  uint32_t r4 = Color(5,0,0);
+  uint32_t r5 = Color(1,0,0);
+  byte f1[]  = {4};
+  byte f2[]  = {3,5};
+  byte f3a[] = {6};  
+  byte f3b[] = {2,14};  
+  byte f4a[] = {7,13};
+  byte f4b[] = {1,15};
+  byte f5a[] = {12};
+  byte f5b[] = {8,16};
+  byte f5c[] = {0,24};
+  byte f6a[] = {11,17};
+  byte f6b[] = {9,23};
+  byte f7a[] = {18};
+  byte f7b[] = {10,22};
+  byte f8[]  = {19,21};
+  byte f9[]  = {20};  
+
   for(int i=0;i<10;i++){
-      
-    uint32_t r1 = Color(255,0,0);
-    uint32_t r2 = Color(200,0,0);
-    uint32_t r3 = Color(10,0,0);
-    uint32_t r4 = Color(5,0,0);
-    uint32_t r5 = Color(1,0,0);
-    byte f1[]  = {4};
-    byte f2[]  = {3,5};
-    byte f3a[] = {6};  
-    byte f3b[] = {2,14};  
-    byte f4a[] = {7,13};
-    byte f4b[] = {1,15};
-    byte f5a[] = {12};
-    byte f5b[] = {8,16};
-    byte f5c[] = {0,24};
-    byte f6a[] = {11,17};
-    byte f6b[] = {9,23};
-    byte f7a[] = {18};
-    byte f7b[] = {10,22};
-    byte f8[]  = {19,21};
-    byte f9[]  = {20};
-    
     ringSet(black);
     setPixelGroup(f1, 1, r1);
     delay(wait);
@@ -806,6 +1069,8 @@ void cylon(uint8_t wait )
     ringSet(black);
     setPixelGroup(f2, 2, r2);
     delay(wait);  
+    if( HWSERIAL.available() )
+      return 111;      
   }
 }
 
@@ -856,7 +1121,7 @@ void bulls(uint32_t c1, uint32_t c2, uint32_t c3, uint8_t wait, int loops)
 }
 
 //BE - should have called this propellor, I think.  It spins a line.
-void spinner(uint32_t bgc, uint32_t fgc, uint8_t wait, int loops, boolean reversed)
+int spinner(uint32_t bgc, uint32_t fgc, uint8_t wait, int loops, boolean reversed)
 {
   ringSet(bgc);
   byte frames[4][5] = {{22,17,12,7,2},{20,18,12,6,4},{10,11,12,13,14},{0,8,12,16,24}};
@@ -879,33 +1144,39 @@ void spinner(uint32_t bgc, uint32_t fgc, uint8_t wait, int loops, boolean revers
         ringSet(bgc);    
       }
     }
+    if( HWSERIAL.available() )
+      return 111;      
   }
 }
 
 //BE - where would we be without the blink tag?
-void allBlink(uint8_t blinks, uint32_t c, uint32_t c2, uint8_t wait ){
+int allBlink(uint8_t blinks, uint32_t c, uint32_t c2, uint8_t wait ){
   for(int i=0;i<blinks;i++)
   {
     ringSet(c);
     delay(wait);
     ringSet(c2);
     delay(wait);
+    if( HWSERIAL.available() )
+      return 111;      
   }
 }
 
 //BE - this writes a random number of pods (150-500) to a random color, in a random order, with a random wait (0-200ms)
-void randommy()
+int randommy()
 {
   for(int i=0;i<random(150,500);i++)
   {
     strip.setPixelColor(random(0,strip.numPixels()),randomColor());
     delay(random(0,200));  
     strip.show();
+    if( HWSERIAL.available() )
+      return 111;      
   }
 }
 
 //BE - alternate pods between two colors
-void ants(uint32_t c1, uint32_t c2, uint8_t wait){
+int ants(uint32_t c1, uint32_t c2, uint8_t wait){
   int i,j;
   for(j=0;j<6;j++)
   {
@@ -930,10 +1201,12 @@ void ants(uint32_t c1, uint32_t c2, uint8_t wait){
     }
     strip.show();
     delay(wait);
+    if( HWSERIAL.available() )
+      return 111;      
   }
 }
 
-void rainbow(uint8_t wait) {
+int rainbow(uint8_t wait) {
   int i, j;
    
   for (j=0; j < 256; j++) {     // 3 cycles of all 256 colors in the wheel
@@ -942,11 +1215,13 @@ void rainbow(uint8_t wait) {
     }  
     strip.show();   // write all the pixels out
     delay(wait);
+    if( HWSERIAL.available() )
+      return 111;      
   }
 }
 // Slightly different, this one makes the rainbow wheel equally distributed 
 // along the chain
-void rainbowCycle(uint8_t wait) {
+int rainbowCycle(uint8_t wait) {
   int i, j;
   
   for (j=0; j < 256 * 5; j++) {     // 5 cycles of all 25 colors in the wheel
@@ -959,6 +1234,8 @@ void rainbowCycle(uint8_t wait) {
     }  
     strip.show();   // write all the pixels out
     delay(wait);
+    if( HWSERIAL.available() )
+      return 111;      
   }
 }
 
@@ -986,7 +1263,7 @@ void ringSet(uint32_t c) {
   strip.show();  
 }
 
-void paletteRand(uint32_t colors[], int colorCount,int maxWait, int loops)
+int paletteRand(uint32_t colors[], int colorCount,int maxWait, int loops)
 {
   for(int j = 0; j < loops; j++)
   {
@@ -996,11 +1273,34 @@ void paletteRand(uint32_t colors[], int colorCount,int maxWait, int loops)
     }
     strip.show();
     delay(random(0,maxWait));
+    if( HWSERIAL.available() )
+      return 111;      
   }
 }
 
 
 /* Helper functions */
+
+//BE
+uint32_t randomColor()
+{
+  //generate a random color
+  int r = random(0,256);
+  int g = random(0,256);
+  int b = random(0,256);
+  return Color(r,g,b);
+}
+
+//BE 
+void array_spin(byte arr[], int count)
+{
+  byte tmp = arr[0];
+  for(int i=0;i<count-1;i++)
+  {
+    arr[i] = arr[i+1];
+  }
+  arr[count-1] = tmp;
+}
 
 // Create a 24 bit color value from R,G,B
 uint32_t Color(byte r, byte g, byte b)
@@ -1012,15 +1312,6 @@ uint32_t Color(byte r, byte g, byte b)
   c <<= 8;
   c |= b;
   return c;
-}
-
-uint32_t randomColor()
-{
-  //generate a random color
-  int r = random(0,256);
-  int g = random(0,256);
-  int b = random(0,256);
-  return Color(r,g,b);
 }
 
 //Input a value 0 to 255 to get a color value.
@@ -1054,11 +1345,12 @@ void decodeColor(uint32_t c, byte ret[])
 
 //BE - pass an array of pixels to this and it'll draw them out in order, with *wait* in ms between each pixel.
 //reverse draws it backwards, useful for animation.
-void colorByNumber(byte pixels[],byte pixelCount, uint32_t bc, uint32_t fc, uint8_t wait, boolean reverse, int enddelay, boolean clears)
+int colorByNumber(byte pixels[],byte pixelCount, uint32_t bc, uint32_t fc, uint8_t wait, boolean reverse, int enddelay, boolean clears)
 {
   int i;
   //set bgcolor
-  ringSet(bc);
+  if(bc < white+50)
+    ringSet(bc);
   if(reverse)
   {
     for(i=0;i<pixelCount;i++)
@@ -1091,12 +1383,14 @@ void colorByNumber(byte pixels[],byte pixelCount, uint32_t bc, uint32_t fc, uint
       delay(wait);   
     }
   } 
+  if( HWSERIAL.available() )
+    return 111;    
   delay(enddelay);
 }
 
 //BE - take an array of pixels and set them all to given color.
 //you probably want to do a colorWipe or ringSet to a background color first.
-void setPixelGroup(byte pixels[],byte pixelCount, uint32_t c)
+int setPixelGroup(byte pixels[],byte pixelCount, uint32_t c)
 {
   byte i;
   uint32_t color = c;
@@ -1109,6 +1403,8 @@ void setPixelGroup(byte pixels[],byte pixelCount, uint32_t c)
     strip.setPixelColor(pixels[i],color);
   }
   strip.show();
+  if( HWSERIAL.available() )
+    return 111;    
 }
 
 //BE - gotta sign your work.
