@@ -83,6 +83,7 @@ uint32_t deepblue = Color(0,11,76);
 //doyoubelieveinmagic?
 uint32_t dybim = white+1;
 
+uint32_t last_fade = black;
 //conway's presets
 byte cgol_emptyPixels[] = {};
 byte cgol_glider[] = {0,0,1,0,0, 1,0,1,0,0, 0,0,1,1,0, 0,0,0,0,0, 0,0,0,0,0};
@@ -134,7 +135,7 @@ void loop() {
         HWSERIAL.print("My available memory is: ");        
         HWSERIAL.println(freeMemory());          
         HWSERIAL.println("/-=~^=-^=-~`='`-~===~----~===~-`'=`~-=^-=^~=-\\");
-        HWSERIAL.println("|                      b = bang()            |");
+        HWSERIAL.println("| a = fade()           b = bang()            |");
         HWSERIAL.println("| c = cylon()          d = progressiveAnts() |");
         HWSERIAL.println("| e = elementalRun()   f = flashlight()      |");        
         HWSERIAL.println("| g = cgol()           h = thehoff()         |");                
@@ -152,16 +153,18 @@ void loop() {
   
   switch(serial_val)
   {
-    /*
     case 'a':
+      uint32_t new_fade;
+      new_fade = randomColor();
       if(new_serial_val == true)
       {
-        HWSERIAL.println("I'm starting alphabet()");
+        HWSERIAL.println("I'm starting fade()");
         new_serial_val = false;
       }
-      alphabet(black, randomColor(), random(0,500));
+      fade(last_fade,new_fade,100,100);
+      last_fade = new_fade;
       break;
-*/
+
     case 'b':
       if(new_serial_val == true)
       {
