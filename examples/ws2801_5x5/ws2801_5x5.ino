@@ -20,6 +20,8 @@
   Strand is controlled via a bluetooth serial connection on Serial1 - a very simplistic protocol chooses the patterns via bluetooth console. 
   If I don't get distracted by another project, I may come back and add a more complex control interface for this, but for now, it's command line. ;)
   
+  I've turned off alphabet because the pattern is kinda boring and it's extremely ram expensive.  That wouldn't matter on any more recent teensy, but on the 2.0, I'm limited to 2560 bytes and alphabet takes me over.
+  
   Modified heavily from the original Adafruit WS2801 example.
   
   LICENSE: Just do it.  Take anything I added to the Adafruit code and use it.  Make something pretty with it.
@@ -135,12 +137,12 @@ void loop() {
         HWSERIAL.print("My available memory is: ");        
         HWSERIAL.println(freeMemory());          
         HWSERIAL.println("/-=~^=-^=-~`='`-~===~----~===~-`'=`~-=^-=^~=-\\");
-        HWSERIAL.println("| a = fade()           b = bang()            |");
+        HWSERIAL.println("| a = aColor()         b = bang()            |");
         HWSERIAL.println("| c = cylon()          d = progressiveAnts() |");
         HWSERIAL.println("| e = elementalRun()   f = flashlight()      |");        
         HWSERIAL.println("| g = cgol()           h = thehoff()         |");                
-        HWSERIAL.println("| i = infinity()                             |");
-        HWSERIAL.println("| m = meander()                              |");        
+        HWSERIAL.println("| i = infinity()       j = fade()            |");
+        HWSERIAL.println("| m = meander()        n = newColor()        |");        
         HWSERIAL.println("| o = off              p = unicornPoo()      |");                
         HWSERIAL.println("| s = unicornSpit()    t = tony()            |");        
         HWSERIAL.println("| u = unattended()     v = spiral()          |");                
@@ -154,15 +156,20 @@ void loop() {
   switch(serial_val)
   {
     case 'a':
-      uint32_t new_fade;
-      new_fade = randomColor();
+      byte r,g,b;
       if(new_serial_val == true)
       {
-        HWSERIAL.println("I'm starting fade()");
+        delay(1030mm);
+        HWSERIAL.println("I'm starting aEcho()");
         new_serial_val = false;
+        r = HWSERIAL.parseInt();
+        g = HWSERIAL.parseInt();
+        b = HWSERIAL.parseInt();
+        HWSERIAL.println(r);          
+        HWSERIAL.println(g); 
+        HWSERIAL.println(b); 
+        ringSet(Color(r,g,b));
       }
-      fade(last_fade,new_fade,100,100);
-      last_fade = new_fade;
       break;
 
     case 'b':
@@ -236,6 +243,18 @@ void loop() {
       }
       infinity();
       break;
+
+    case 'j':
+      uint32_t new_fade;
+      new_fade = randomColor();
+      if(new_serial_val == true)
+      {
+        HWSERIAL.println("I'm starting fade()");
+        new_serial_val = false;
+      }
+      fade(last_fade,new_fade,100,100);
+      last_fade = new_fade;
+      break;    
     
     case 'm':
       if(new_serial_val == true)        
@@ -246,6 +265,15 @@ void loop() {
       meander(black,dybim,50,true,0,true);  
       meander(black,dybim,50,false,0,true);  
       break;
+      
+    case 'n':
+      if(new_serial_val == true)        
+      {
+        HWSERIAL.println("I'm writing a new color");
+        new_serial_val = false;
+        ringSet(randomColor());
+      }
+      break;      
       
     case 'o':
       if(new_serial_val == true)        
@@ -315,8 +343,6 @@ void unattended(){
   meander(black,dybim,50,true,0,false);
   meander(black,dybim,50,true,0,true);  
   meander(black,dybim,50,false,0,true);  
-  meander(black,dybim,50,true,0,true);  
-  meander(black,dybim,50,false,0,true);    
   spiral(black ,dybim, 50, false, 0, true);  
   spiral(black ,dybim, 50, true, 0, true);      
   count_em();
@@ -324,14 +350,13 @@ void unattended(){
   cgol(blue,green,500,60,cgol_emptyPixels, false, true);
   cgol(red,blue,500,60,cgol_emptyPixels, false, false);
   cgol(orange,black,500,60,cgol_emptyPixels, false, false);
-  cgol(blue,yellow,500,60,cgol_emptyPixels, false, false);  
   tony();  
   infinity();
   elementalRun();    
   unicornPoo(50,500);
   unicornSpit(50,50);
   cylon(100);    
-  progressiveAnts(red,blue,500);  
+  progressiveAnts(red,randomColor(),500);  
   primaryBars();  
   spiral(black ,dybim, 50, false, 0, true);  
   spiral(black ,dybim, 50, true, 0, true);    
@@ -342,45 +367,17 @@ void unattended(){
   meander(black,dybim,50,true,0,true);  
   meander(black,dybim,50,false,0,true);  
   spiral(black ,dybim, 50, true, 0, false);  
-  spiral(black ,dybim, 50, false, 0, false);  
+  spiral(black ,dybim, 50, false, 0, false); 
+  cgol(blue,yellow,500,60,cgol_emptyPixels, false, false);    
+  the_hoff(black ,red, 150);  
+  spinner(red,blue,90,20,true);
+  spinner(red,blue,90,20,false);  
+  progressiveAnts(red,blue,500);    
   spiral(red ,dybim, 50, false, 0, true);  
   spiral(green ,dybim, 50, true, 0, false);  
   spiral(blue ,dybim, 50, false, 0, true);  
-  the_hoff(black ,red, 150);  
-//  alphabet(black, orangered, 200);
-  spinner(red,blue,90,20,true);
-  spinner(red,blue,90,20,false);  
-  flashlight(2000);    
-  githubAvatar();
-  cgol(black,randomColor(),100,60,cgol_glider, true, false);
-  fade(red,orange,100,100);
-  fade(orange,yellow,100,100);
-  fade(yellow,green,100,100);
-  fade(green,blue,100,100);
-  fade(blue,indigo,100,100);
-  fade(indigo,violet,100,100);
-  fade(violet,red,100,100);
-  smiley(black, yellow, 250, false, 1000);  
-  meh(black, green, 250, false, 1000);  
-  frowny(black, blue, 250, false, 1000);     
-  colorWipe(Color(255, 0, 0), 50);
-  colorWipe(Color(0, 255, 0), 50);
-  colorWipe(Color(0, 0, 255), 50);  
-  bulls(red,green,blue,250,20);  
-  spiral(orangered, blue, 50, false, 0, false);
-  spiral(orangered, blue, 50, true, 0, false);  
-  spiral(orangered, blue, 50, false, 0, false);
-  spiral(blue ,orangered, 50, false, 0, false);
-  spiral(orangered, blue, 50, true, 0, false);
-  spiral(blue ,orangered, 50, true, 0, false); 
-  spiral(orangered, blue, 50, false, 0, false);
-  spiral(orangered, blue, 50, true, 0, false); 
-  ants(Color(0,255,0),Color(0,0,0),500);  
-  allBlink(10, Color(255,0,0), Color(0,0,0), 500);
-  randommy();
-  rainbow(20);
-  rainbowCycle(20);
-  bang(black, red, 250, false, 1000);  
+  meander(black,dybim,50,true,0,true);  
+  meander(black,dybim,50,false,0,true); 
 }
 
 //BE - a chasing infinity symbol
@@ -520,7 +517,7 @@ void hello(uint32_t bgc, uint32_t fgc, int wait)
 }
 
 //BE - text 
-/*
+
 void alphabet(uint32_t bgc, uint32_t fgc, int wait)
 {
   //letters 
@@ -628,7 +625,7 @@ void alphabet(uint32_t bgc, uint32_t fgc, int wait)
   ringSet(bgc);
   setPixelGroup(l_z, sizeof(l_z)/sizeof(byte), fgc);
   delay(wait);      
-}*/
+}
 
 //BE - Conway's Game of Life
 int cgol(uint32_t bgc, uint32_t fgc, int wait, int maxGenerations, byte pixels[], boolean usePixels, boolean emote)
